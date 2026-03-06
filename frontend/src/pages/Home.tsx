@@ -1,17 +1,13 @@
 import { motion } from 'motion/react';
-import { apiUrl } from '../config/api';
 import { Link } from 'react-router-dom';
-import { apiUrl } from '../config/api';
 import { Search, Star, Shield, Zap, ArrowRight } from 'lucide-react';
-import { apiUrl } from '../config/api';
 import { useEffect, useState } from 'react';
-import { apiUrl } from '../config/api';
 
 export default function Home() {
   const [featuredTutors, setFeaturedTutors] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch(apiUrl('/api/tutors?limit=3')
+    fetch('/api/tutors?limit=3')
       .then(res => res.json())
       .then(data => setFeaturedTutors(data.slice(0, 3)));
   }, []);

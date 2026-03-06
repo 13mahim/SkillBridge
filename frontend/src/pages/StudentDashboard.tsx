@@ -1,13 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { apiUrl } from '../config/api';
 import { useAuth } from '../contexts/AuthContext';
-import { apiUrl } from '../config/api';
 import { Calendar, Clock, CheckCircle, XCircle, Star, LayoutDashboard, BookOpen, User } from 'lucide-react';
-import { apiUrl } from '../config/api';
 import { motion } from 'motion/react';
-import { apiUrl } from '../config/api';
 import { Link } from 'react-router-dom';
-import { apiUrl } from '../config/api';
 
 export default function StudentDashboard() {
   const { user } = useAuth();
@@ -23,7 +18,7 @@ export default function StudentDashboard() {
   }, []);
 
   const fetchBookings = async () => {
-    const res = await fetch(apiUrl('/api/bookings');
+    const res = await fetch('/api/bookings');
     const data = await res.json();
     setBookings(data);
     setLoading(false);
@@ -41,7 +36,7 @@ export default function StudentDashboard() {
 
   const handleReview = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await fetch(apiUrl('/api/reviews', {
+    const res = await fetch('/api/reviews', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

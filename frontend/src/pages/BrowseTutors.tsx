@@ -1,11 +1,7 @@
 import { useState, useEffect } from 'react';
-import { apiUrl } from '../config/api';
 import { Link } from 'react-router-dom';
-import { apiUrl } from '../config/api';
 import { Search, Filter, Star, MapPin, DollarSign } from 'lucide-react';
-import { apiUrl } from '../config/api';
 import { motion } from 'motion/react';
-import { apiUrl } from '../config/api';
 
 export default function BrowseTutors() {
   const [tutors, setTutors] = useState<any[]>([]);
@@ -15,7 +11,7 @@ export default function BrowseTutors() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(apiUrl('/api/categories')
+    fetch('/api/categories')
       .then(res => res.json())
       .then(setCategories);
   }, []);

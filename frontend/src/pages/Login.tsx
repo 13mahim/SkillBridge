@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { LogIn, Mail, Lock, GraduationCap } from 'lucide-react';
 import { motion } from 'motion/react';
-import { apiUrl } from '../config/api';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -18,7 +17,7 @@ export default function Login() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch(apiUrl('/api/auth/login'), {
+      const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })

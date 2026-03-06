@@ -40,7 +40,7 @@ export default function TutorProfile() {
     const startTime = new Date(`${bookingData.date}T${bookingData.time}`);
     const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // 1 hour session
 
-    const res = await fetch(apiUrl('/api/bookings', {
+    const res = await fetch('/api/bookings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

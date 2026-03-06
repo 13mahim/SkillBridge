@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { apiUrl } from '../config/api';
 import { LayoutDashboard, Users, Calendar as BookingsIcon, Tag, ShieldAlert, ShieldCheck, Trash2, GraduationCap, UserCircle } from 'lucide-react';
-import { apiUrl } from '../config/api';
 import { motion } from 'motion/react';
-import { apiUrl } from '../config/api';
 
 export default function AdminDashboard() {
   const [users, setUsers] = useState<any[]>([]);
@@ -20,9 +17,9 @@ export default function AdminDashboard() {
 
   const fetchData = async () => {
     const [usersRes, bookingsRes, catsRes] = await Promise.all([
-      fetch(apiUrl('/api/admin/users'),
-      fetch(apiUrl('/api/bookings'),
-      fetch(apiUrl('/api/categories')
+      fetch('/api/admin/users'),
+      fetch('/api/bookings'),
+      fetch('/api/categories')
     ]);
     setUsers(await usersRes.json());
     setBookings(await bookingsRes.json());
@@ -508,7 +505,7 @@ export default function AdminDashboard() {
                 <div className="bg-emerald-50 p-6 rounded-2xl border border-emerald-100">
                   <form onSubmit={async (e) => {
                     e.preventDefault();
-                    const res = await fetch(apiUrl('/api/admin/categories', {
+                    const res = await fetch('/api/admin/categories', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify(newCategory)
