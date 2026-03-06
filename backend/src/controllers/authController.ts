@@ -9,13 +9,26 @@ export const register = async (req: AuthRequest, res: Response) => {
   const { name, email, password, role } = req.body;
   
   try {
+    const usePostgres = process.env.DATABASE_URL && process.env.DATABASE_URL.trim() !== '';
     const hashedPassword = await bcrypt.hash(password, 10);
-    const result = await db.prepare('INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4)').run(
-      name, email, hashedPassword, role
-    );
     
-    if (role === 'tutor') {
-      await db.prepare('INSERT INTO tutor_profiles (user_id) VALUES ($1)').run(result.lastInsertRowid);
+    let result;
+    if (usePostgres) {
+      result = await db.prepare('INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4)').run(
+        name, email, hashedPassword, role
+      );
+      
+      if (role === 'tutor') {
+        await db.prepare('INSERT INTO tutor_profiles (user_id) VALUES ($1)').run(result.lastInsertRowid);
+      }
+    } else {
+      result = await db.prepare('INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)').run(
+        name, email, hashedPassword, role
+      );
+      
+      if (role === 'tutor') {
+        await db.prepare('INSERT INTO tutor_profiles (user_id) VALUES (?)').run(result.lastInsertRowid);
+      }
     }
 
     const token = jwt.sign({ id: result.lastInsertRowid, email, role }, config.jwtSecret);
@@ -28,9 +41,16 @@ export const register = async (req: AuthRequest, res: Response) => {
 
 export const login = async (req: AuthRequest, res: Response) => {
   const { email, password } = req.body;
-  const user: any = await db.prepare('SELECT * FROM users WHERE email = $1').get(email);
+  const usePostgres = process.env.DATABASE_URL && process.env.DATABASE_URL.trim() !== '';
+  const placeholder = usePostgres ? '$1' : '?';
   
-  if (!user || !(await bcrypt.compare(password, user.password))) {
+  const user: any = await db.prepare(`SELECT * FROM users WHERE email = ${placeholder}`).get(email);
+  
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+  
+  if (!(await bcrypt.compare(password, user.password))) {
     return res.status(401).json({ error: 'Invalid credentials' });
   }
   
@@ -40,7 +60,10 @@ export const login = async (req: AuthRequest, res: Response) => {
 };
 
 export const getMe = async (req: AuthRequest, res: Response) => {
-  const user: any = await db.prepare('SELECT id, name, email, role, avatar_url, created_at FROM users WHERE id = $1').get(req.user!.id);
+  const usePostgres = process.env.DATABASE_URL && process.env.DATABASE_URL.trim() !== '';
+  const placeholder = usePostgres ? '$1' : '?';
+  
+  const user: any = await db.prepare(`SELECT id, name, email, role, avatar_url, created_at FROM users WHERE id = ${placeholder}`).get(req.user!.id);
   res.json({ user });
 };
 
