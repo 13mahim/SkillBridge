@@ -1,13 +1,8 @@
 import { useState, useEffect } from 'react';
-import { apiUrl } from '../config/api';
 import { useParams, useNavigate } from 'react-router-dom';
-import { apiUrl } from '../config/api';
 import { useAuth } from '../contexts/AuthContext';
-import { apiUrl } from '../config/api';
 import { Star, MapPin, DollarSign, Calendar, Clock, Award, BookOpen, ArrowLeft } from 'lucide-react';
-import { apiUrl } from '../config/api';
 import { motion } from 'motion/react';
-import { apiUrl } from '../config/api';
 
 export default function TutorProfile() {
   const { id } = useParams();
