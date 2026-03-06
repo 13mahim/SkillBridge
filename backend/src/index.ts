@@ -21,21 +21,34 @@ async function startServer() {
   // Initialize database
   await initDb();
 
+  // Check if using PostgreSQL or SQLite
+  const usePostgres = process.env.DATABASE_URL && process.env.DATABASE_URL.trim() !== '';
+  const placeholder = usePostgres ? '$1' : '?';
+
   // Seed Admin if not exists
-  const adminExists = await db.prepare('SELECT * FROM users WHERE role = $1').get('admin');
+  const adminExists = await db.prepare(`SELECT * FROM users WHERE role = ${placeholder}`).get('admin');
   if (!adminExists) {
     const hashedPassword = await bcrypt.hash('admin123', 10);
-    await db.prepare('INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4)').run(
-      'System Admin',
-      'admin@skillbridge.com',
-      hashedPassword,
-      'admin'
-    );
+    if (usePostgres) {
+      await db.prepare('INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4)').run(
+        'System Admin',
+        'admin@skillbridge.com',
+        hashedPassword,
+        'admin'
+      );
+    } else {
+      await db.prepare('INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)').run(
+        'System Admin',
+        'admin@skillbridge.com',
+        hashedPassword,
+        'admin'
+      );
+    }
     console.log('✅ Admin user seeded: admin@skillbridge.com / admin123');
   }
 
   // Seed Tutors if not exists
-  const tutorCount = await db.prepare('SELECT COUNT(*) as count FROM users WHERE role = $1').get('tutor');
+  const tutorCount = await db.prepare(`SELECT COUNT(*) as count FROM users WHERE role = ${placeholder}`).get('tutor');
   if (tutorCount && tutorCount.count === 0) {
     const tutorPassword = await bcrypt.hash('tutor123', 10);
     
@@ -49,12 +62,22 @@ async function startServer() {
     ];
     
     for (const tutor of tutors) {
-      const result = await db.prepare('INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4)').run(
-        tutor.name, tutor.email, tutorPassword, 'tutor'
-      );
-      await db.prepare('INSERT INTO tutor_profiles (user_id, bio, hourly_rate, subjects, rating, review_count) VALUES ($1, $2, $3, $4, $5, $6)').run(
-        result.lastInsertRowid, tutor.bio, tutor.hourly_rate, tutor.subjects, tutor.rating, tutor.review_count
-      );
+      let result;
+      if (usePostgres) {
+        result = await db.prepare('INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4)').run(
+          tutor.name, tutor.email, tutorPassword, 'tutor'
+        );
+        await db.prepare('INSERT INTO tutor_profiles (user_id, bio, hourly_rate, subjects, rating, review_count) VALUES ($1, $2, $3, $4, $5, $6)').run(
+          result.lastInsertRowid, tutor.bio, tutor.hourly_rate, tutor.subjects, tutor.rating, tutor.review_count
+        );
+      } else {
+        result = await db.prepare('INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)').run(
+          tutor.name, tutor.email, tutorPassword, 'tutor'
+        );
+        await db.prepare('INSERT INTO tutor_profiles (user_id, bio, hourly_rate, subjects, rating, review_count) VALUES (?, ?, ?, ?, ?, ?)').run(
+          result.lastInsertRowid, tutor.bio, tutor.hourly_rate, tutor.subjects, tutor.rating, tutor.review_count
+        );
+      }
     }
     console.log('✅ 6 tutors seeded with password: tutor123');
   }

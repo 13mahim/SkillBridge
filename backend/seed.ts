@@ -1,89 +1,70 @@
-import db, { initDb } from './src/models/database.ts';
+import { initDb } from './src/models/database.js';
+import db from './src/config/database.js';
 import bcrypt from 'bcryptjs';
 
 async function seedTutors() {
-  initDb();
+  await initDb();
 
   const tutors = [
     {
-      name: 'Dr. Sarah Ahmed',
-      email: 'sarah.ahmed@example.com',
+      name: 'Dr. Sarah Johnson',
+      email: 'sarah.johnson@skillbridge.com',
       password: 'tutor123',
-      bio: 'PhD in Mathematics with 10+ years of teaching experience. Specialized in Calculus, Algebra, and Statistics.',
+      bio: 'PhD in Mathematics with 15 years of teaching experience.',
       hourly_rate: 50,
-      subjects: 'Mathematics, Calculus, Algebra, Statistics',
-      availability: JSON.stringify({
-        monday: ['09:00-12:00', '14:00-17:00'],
-        wednesday: ['09:00-12:00', '14:00-17:00'],
-        friday: ['09:00-12:00', '14:00-17:00']
-      })
+      subjects: 'Mathematics, Calculus, Algebra',
+      rating: 4.9,
+      review_count: 127
     },
     {
-      name: 'Prof. Karim Rahman',
-      email: 'karim.rahman@example.com',
+      name: 'Prof. Michael Chen',
+      email: 'michael.chen@skillbridge.com',
       password: 'tutor123',
-      bio: 'Computer Science professor with expertise in Python, JavaScript, and Web Development. Love teaching programming!',
+      bio: 'Computer Science professor and software engineer.',
       hourly_rate: 60,
-      subjects: 'Computer Science, Python, JavaScript, Web Development',
-      availability: JSON.stringify({
-        tuesday: ['10:00-13:00', '15:00-18:00'],
-        thursday: ['10:00-13:00', '15:00-18:00'],
-        saturday: ['10:00-16:00']
-      })
+      subjects: 'Computer Science, Python, JavaScript',
+      rating: 4.8,
+      review_count: 98
     },
     {
-      name: 'Ms. Fatima Khan',
-      email: 'fatima.khan@example.com',
+      name: 'Emma Williams',
+      email: 'emma.williams@skillbridge.com',
       password: 'tutor123',
-      bio: 'Physics and Chemistry expert. Making science fun and easy to understand for students of all levels.',
-      hourly_rate: 45,
-      subjects: 'Science, Physics, Chemistry',
-      availability: JSON.stringify({
-        monday: ['13:00-17:00'],
-        wednesday: ['13:00-17:00'],
-        friday: ['13:00-17:00']
-      })
-    },
-    {
-      name: 'Mr. Rahim Hossain',
-      email: 'rahim.hossain@example.com',
-      password: 'tutor123',
-      bio: 'English Language specialist. IELTS and TOEFL preparation expert with 8 years experience.',
+      bio: 'Native English speaker with TEFL certification.',
       hourly_rate: 40,
-      subjects: 'Languages, English, IELTS, TOEFL',
-      availability: JSON.stringify({
-        monday: ['09:00-12:00'],
-        tuesday: ['09:00-12:00'],
-        wednesday: ['09:00-12:00'],
-        thursday: ['09:00-12:00'],
-        friday: ['09:00-12:00']
-      })
+      subjects: 'English, IELTS, Business English',
+      rating: 4.7,
+      review_count: 156
     },
     {
-      name: 'Dr. Nadia Islam',
-      email: 'nadia.islam@example.com',
+      name: 'Dr. James Rodriguez',
+      email: 'james.rodriguez@skillbridge.com',
       password: 'tutor123',
-      bio: 'Business and Economics teacher. MBA from top university. Helping students excel in business studies.',
+      bio: 'Physics PhD with a passion for making complex concepts simple.',
       hourly_rate: 55,
-      subjects: 'Business, Economics, Accounting, Finance',
-      availability: JSON.stringify({
-        tuesday: ['14:00-18:00'],
-        thursday: ['14:00-18:00'],
-        saturday: ['09:00-15:00']
-      })
+      subjects: 'Physics, Mechanics, Electromagnetism',
+      rating: 4.9,
+      review_count: 89
     },
     {
-      name: 'Mr. Tanvir Ahmed',
-      email: 'tanvir.ahmed@example.com',
+      name: 'Lisa Anderson',
+      email: 'lisa.anderson@skillbridge.com',
       password: 'tutor123',
-      bio: 'History and Social Studies expert. Making history come alive through engaging storytelling.',
-      hourly_rate: 35,
-      subjects: 'Arts & Humanities, History, Social Studies',
-      availability: JSON.stringify({
-        monday: ['15:00-19:00'],
-        wednesday: ['15:00-19:00'],
-        friday: ['15:00-19:00']
-      })
+      bio: 'Professional artist and art history teacher.',
+      hourly_rate: 45,
+      subjects: 'Art, Drawing, Painting',
+      rating: 4.6,
+      review_count: 73
+    },
+    {
+      name: 'David Kim',
+      email: 'david.kim@skillbridge.com',
+      password: 'tutor123',
+      bio: 'MBA graduate and business consultant.',
+      hourly_rate: 65,
+      subjects: 'Business, Economics, Finance',
+      rating: 4.8,
+      review_count: 112
     }
   ];
 
@@ -102,8 +83,8 @@ async function seedTutors() {
     ).run(tutor.name, tutor.email, hashedPassword, 'tutor');
 
     db.prepare(
-      'INSERT INTO tutor_profiles (user_id, bio, hourly_rate, subjects, availability) VALUES (?, ?, ?, ?, ?)'
-    ).run(result.lastInsertRowid, tutor.bio, tutor.hourly_rate, tutor.subjects, tutor.availability);
+      'INSERT INTO tutor_profiles (user_id, bio, hourly_rate, subjects, rating, review_count) VALUES (?, ?, ?, ?, ?, ?)'
+    ).run(result.lastInsertRowid, tutor.bio, tutor.hourly_rate, tutor.subjects, tutor.rating, tutor.review_count);
 
     console.log(`✓ Added tutor: ${tutor.name}`);
   }
