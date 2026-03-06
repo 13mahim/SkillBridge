@@ -96,7 +96,7 @@ export default function BrowseTutors() {
                     )}
                     <div className="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1 shadow-sm">
                       <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                      {tutor.rating.toFixed(1)}
+                      {Number(tutor.rating || 0).toFixed(1)}
                     </div>
                   </div>
                   <div className="p-6 flex-1 flex flex-col justify-between space-y-4">

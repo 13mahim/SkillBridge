@@ -380,7 +380,7 @@ export default function TutorDashboard() {
                   <h3 className="font-bold text-lg">{user?.name}</h3>
                   <div className="flex items-center gap-1 text-yellow-500 font-bold">
                     <Star className="w-4 h-4 fill-current" />
-                    {profile?.rating.toFixed(1)}
+                    {Number(profile?.rating || 0).toFixed(1)}
                   </div>
                 </div>
               </div>

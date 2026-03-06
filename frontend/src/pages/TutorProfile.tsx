@@ -118,7 +118,7 @@ export default function TutorProfile() {
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-1 bg-white/20 backdrop-blur px-3 py-1 rounded-full">
                       <Star className="w-5 h-5 fill-current text-yellow-400" />
-                      <span className="font-bold">{tutor.rating.toFixed(1)}</span>
+                      <span className="font-bold">{Number(tutor.rating || 0).toFixed(1)}</span>
                       <span className="text-white/70">({tutor.review_count} reviews)</span>
                     </div>
                   </div>
@@ -235,7 +235,7 @@ export default function TutorProfile() {
                     <Star className="w-5 h-5 text-emerald-600" />
                     <div>
                       <div className="text-xs text-neutral-400 uppercase font-bold">Rating</div>
-                      <div className="font-bold">{tutor.rating.toFixed(1)} ({tutor.review_count} reviews)</div>
+                      <div className="font-bold">{Number(tutor.rating || 0).toFixed(1)} ({tutor.review_count} reviews)</div>
                     </div>
                   </div>
                 </div>
