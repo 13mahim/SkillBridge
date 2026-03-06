@@ -1,4 +1,4 @@
-import pool from './postgres.ts';
+import pool from './postgres';
 
 class DatabaseAdapter {
   // Execute SQL query

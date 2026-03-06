@@ -1,3 +1,3 @@
-import db from './db-adapter.ts';
+import db from './db-adapter';
 
 export default db;

@@ -1,18 +1,18 @@
 import { Response } from 'express';
-import db from '../config/database.ts';
-import { AuthRequest } from '../middlewares/auth.ts';
+import db from '../config/database';
+import { AuthRequest } from '../middlewares/auth';
 
-export const createReview = (req: AuthRequest, res: Response) => {
+export const createReview = async (req: AuthRequest, res: Response) => {
   const { bookingId, tutorId, rating, comment } = req.body;
   
   try {
-    db.prepare('INSERT INTO reviews (booking_id, student_id, tutor_id, rating, comment) VALUES (?, ?, ?, ?, ?)').run(
+    await db.prepare('INSERT INTO reviews (booking_id, student_id, tutor_id, rating, comment) VALUES ($1, $2, $3, $4, $5)').run(
       bookingId, req.user!.id, tutorId, rating, comment
     );
     
     // Update tutor average rating
-    const stats: any = db.prepare('SELECT AVG(rating) as avg, COUNT(*) as count FROM reviews WHERE tutor_id = ?').get(tutorId);
-    db.prepare('UPDATE tutor_profiles SET rating = ?, review_count = ? WHERE user_id = ?').run(
+    const stats: any = await db.prepare('SELECT AVG(rating) as avg, COUNT(*) as count FROM reviews WHERE tutor_id = $1').get(tutorId);
+    await db.prepare('UPDATE tutor_profiles SET rating = $1, review_count = $2 WHERE user_id = $3').run(
       stats.avg, stats.count, tutorId
     );
 

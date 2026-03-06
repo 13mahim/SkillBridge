@@ -1,18 +1,18 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import bcrypt from 'bcryptjs';
-import { config } from './config/index.ts';
-import { corsMiddleware } from './middlewares/cors.ts';
-import { initDb } from './models/database.ts';
-import db from './config/database.ts';
+import { config } from './config/index';
+import { corsMiddleware } from './middlewares/cors';
+import { initDb } from './models/database';
+import db from './config/database';
 
 // Routes
-import authRoutes from './routes/authRoutes.ts';
-import tutorRoutes from './routes/tutorRoutes.ts';
-import bookingRoutes from './routes/bookingRoutes.ts';
-import categoryRoutes from './routes/categoryRoutes.ts';
-import reviewRoutes from './routes/reviewRoutes.ts';
-import adminRoutes from './routes/adminRoutes.ts';
+import authRoutes from './routes/authRoutes';
+import tutorRoutes from './routes/tutorRoutes';
+import bookingRoutes from './routes/bookingRoutes';
+import categoryRoutes from './routes/categoryRoutes';
+import reviewRoutes from './routes/reviewRoutes';
+import adminRoutes from './routes/adminRoutes';
 
 async function startServer() {
   const app = express();
