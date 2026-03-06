@@ -8,12 +8,13 @@ router.post('/seed-tutors', async (req: Request, res: Response) => {
   try {
     const usePostgres = process.env.DATABASE_URL && process.env.DATABASE_URL.trim() !== '';
     const placeholder = usePostgres ? '$1' : '?';
+    const force = req.query.force === 'true';
     
     // Check if tutors already exist
     const tutorCount = await db.prepare(`SELECT COUNT(*) as count FROM users WHERE role = ${placeholder}`).get('tutor');
     
-    if (tutorCount && tutorCount.count > 0) {
-      return res.json({ message: 'Tutors already exist', count: tutorCount.count });
+    if (!force && tutorCount && tutorCount.count > 0) {
+      return res.json({ message: 'Tutors already exist', count: tutorCount.count, hint: 'Use ?force=true to seed anyway' });
     }
 
     const tutorPassword = await bcrypt.hash('tutor123', 10);
@@ -28,27 +29,36 @@ router.post('/seed-tutors', async (req: Request, res: Response) => {
     ];
     
     let created = 0;
+    let skipped = 0;
     for (const tutor of tutors) {
-      let result;
-      if (usePostgres) {
-        result = await db.prepare('INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4)').run(
-          tutor.name, tutor.email, tutorPassword, 'tutor'
-        );
-        await db.prepare('INSERT INTO tutor_profiles (user_id, bio, hourly_rate, subjects, rating, review_count) VALUES ($1, $2, $3, $4, $5, $6)').run(
-          result.lastInsertRowid, tutor.bio, tutor.hourly_rate, tutor.subjects, tutor.rating, tutor.review_count
-        );
-      } else {
-        result = await db.prepare('INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)').run(
-          tutor.name, tutor.email, tutorPassword, 'tutor'
-        );
-        await db.prepare('INSERT INTO tutor_profiles (user_id, bio, hourly_rate, subjects, rating, review_count) VALUES (?, ?, ?, ?, ?, ?)').run(
-          result.lastInsertRowid, tutor.bio, tutor.hourly_rate, tutor.subjects, tutor.rating, tutor.review_count
-        );
+      try {
+        let result;
+        if (usePostgres) {
+          result = await db.prepare('INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4)').run(
+            tutor.name, tutor.email, tutorPassword, 'tutor'
+          );
+          await db.prepare('INSERT INTO tutor_profiles (user_id, bio, hourly_rate, subjects, rating, review_count) VALUES ($1, $2, $3, $4, $5, $6)').run(
+            result.lastInsertRowid, tutor.bio, tutor.hourly_rate, tutor.subjects, tutor.rating, tutor.review_count
+          );
+        } else {
+          result = await db.prepare('INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)').run(
+            tutor.name, tutor.email, tutorPassword, 'tutor'
+          );
+          await db.prepare('INSERT INTO tutor_profiles (user_id, bio, hourly_rate, subjects, rating, review_count) VALUES (?, ?, ?, ?, ?, ?)').run(
+            result.lastInsertRowid, tutor.bio, tutor.hourly_rate, tutor.subjects, tutor.rating, tutor.review_count
+          );
+        }
+        created++;
+      } catch (err: any) {
+        if (err.message && err.message.includes('UNIQUE')) {
+          skipped++;
+        } else {
+          throw err;
+        }
       }
-      created++;
     }
     
-    res.json({ success: true, message: `${created} tutors created successfully`, password: 'tutor123' });
+    res.json({ success: true, message: `${created} tutors created, ${skipped} skipped (already exist)`, password: 'tutor123' });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
