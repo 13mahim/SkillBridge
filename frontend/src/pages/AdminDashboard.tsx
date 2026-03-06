@@ -71,18 +71,22 @@ export default function AdminDashboard() {
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
         {[
-          { label: 'Students', value: students.length, icon: UserCircle, color: 'text-blue-600', bg: 'bg-blue-50' },
-          { label: 'Tutors', value: tutors.length, icon: GraduationCap, color: 'text-purple-600', bg: 'bg-purple-50' },
-          { label: 'Total Bookings', value: bookings.length, icon: BookingsIcon, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-          { label: 'Categories', value: categories.length, icon: Tag, color: 'text-orange-600', bg: 'bg-orange-50' },
+          { label: 'Students', value: students.length, icon: UserCircle, color: 'text-blue-600', bg: 'bg-blue-50', tab: 'students' as const },
+          { label: 'Tutors', value: tutors.length, icon: GraduationCap, color: 'text-purple-600', bg: 'bg-purple-50', tab: 'tutors' as const },
+          { label: 'Total Bookings', value: bookings.length, icon: BookingsIcon, color: 'text-emerald-600', bg: 'bg-emerald-50', tab: 'bookings' as const },
+          { label: 'Categories', value: categories.length, icon: Tag, color: 'text-orange-600', bg: 'bg-orange-50', tab: 'categories' as const },
         ].map((stat, i) => (
-          <div key={i} className="bg-white p-6 rounded-3xl border border-neutral-200 space-y-2">
-            <div className={`w-10 h-10 ${stat.bg} ${stat.color} rounded-xl flex items-center justify-center`}>
+          <button
+            key={i}
+            onClick={() => setActiveTab(stat.tab)}
+            className="bg-white p-6 rounded-3xl border border-neutral-200 space-y-2 hover:border-emerald-300 hover:shadow-lg transition-all text-left group cursor-pointer"
+          >
+            <div className={`w-10 h-10 ${stat.bg} ${stat.color} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
               <stat.icon className="w-5 h-5" />
             </div>
             <div className="text-2xl font-bold">{stat.value}</div>
             <div className="text-xs font-bold text-neutral-400 uppercase tracking-wider">{stat.label}</div>
-          </div>
+          </button>
         ))}
       </div>
 
