@@ -33,6 +33,31 @@ async function startServer() {
     console.log('✅ Admin user seeded: admin@skillbridge.com / admin123');
   }
 
+  // Seed Tutors if not exists
+  const tutorCount = await db.prepare('SELECT COUNT(*) as count FROM users WHERE role = $1').get('tutor');
+  if (tutorCount && tutorCount.count === 0) {
+    const tutorPassword = await bcrypt.hash('tutor123', 10);
+    
+    const tutors = [
+      { name: 'Dr. Sarah Johnson', email: 'sarah.johnson@skillbridge.com', bio: 'PhD in Mathematics with 15 years of teaching experience.', hourly_rate: 50, subjects: 'Mathematics, Calculus, Algebra', rating: 4.9, review_count: 127 },
+      { name: 'Prof. Michael Chen', email: 'michael.chen@skillbridge.com', bio: 'Computer Science professor and software engineer.', hourly_rate: 60, subjects: 'Computer Science, Python, JavaScript', rating: 4.8, review_count: 98 },
+      { name: 'Emma Williams', email: 'emma.williams@skillbridge.com', bio: 'Native English speaker with TEFL certification.', hourly_rate: 40, subjects: 'English, IELTS, Business English', rating: 4.7, review_count: 156 },
+      { name: 'Dr. James Rodriguez', email: 'james.rodriguez@skillbridge.com', bio: 'Physics PhD with a passion for making complex concepts simple.', hourly_rate: 55, subjects: 'Physics, Mechanics, Electromagnetism', rating: 4.9, review_count: 89 },
+      { name: 'Lisa Anderson', email: 'lisa.anderson@skillbridge.com', bio: 'Professional artist and art history teacher.', hourly_rate: 45, subjects: 'Art, Drawing, Painting', rating: 4.6, review_count: 73 },
+      { name: 'David Kim', email: 'david.kim@skillbridge.com', bio: 'MBA graduate and business consultant.', hourly_rate: 65, subjects: 'Business, Economics, Finance', rating: 4.8, review_count: 112 }
+    ];
+    
+    for (const tutor of tutors) {
+      const result = await db.prepare('INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4)').run(
+        tutor.name, tutor.email, tutorPassword, 'tutor'
+      );
+      await db.prepare('INSERT INTO tutor_profiles (user_id, bio, hourly_rate, subjects, rating, review_count) VALUES ($1, $2, $3, $4, $5, $6)').run(
+        result.lastInsertRowid, tutor.bio, tutor.hourly_rate, tutor.subjects, tutor.rating, tutor.review_count
+      );
+    }
+    console.log('✅ 6 tutors seeded with password: tutor123');
+  }
+
   // Middlewares
   app.use(corsMiddleware);
   app.use(express.json({ limit: '10mb' })); // Increased limit for base64 images
