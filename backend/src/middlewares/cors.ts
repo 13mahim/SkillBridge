@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { config } from '../config/index';
+import { config } from '../config/index.js';
 
 export const corsMiddleware = (req: Request, res: Response, next: NextFunction) => {
   res.header('Access-Control-Allow-Origin', config.corsOrigin);

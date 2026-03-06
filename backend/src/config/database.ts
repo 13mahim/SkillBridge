@@ -1,3 +1,3 @@
-import db from './db-adapter';
+import db from './db-adapter.js';
 
 export default db;

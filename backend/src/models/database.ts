@@ -1,4 +1,4 @@
-import { initPostgresDb } from './postgres-schema';
+import { initPostgresDb } from './postgres-schema.js';
 
 export function initDb() {
   return initPostgresDb();

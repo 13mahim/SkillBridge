@@ -1,6 +1,6 @@
 import { Response } from 'express';
-import db from '../config/database';
-import { AuthRequest } from '../middlewares/auth';
+import db from '../config/database.js';
+import { AuthRequest } from '../middlewares/auth.js';
 
 export const createReview = async (req: AuthRequest, res: Response) => {
   const { bookingId, tutorId, rating, comment } = req.body;

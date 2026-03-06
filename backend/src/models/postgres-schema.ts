@@ -1,4 +1,4 @@
-import pool from '../config/postgres';
+import pool from '../config/postgres.js';
 
 export async function initPostgresDb() {
   const client = await pool.connect();

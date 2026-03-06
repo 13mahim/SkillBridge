@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import db from '../config/database';
+import db from '../config/database.js';
 
 export const getAllUsers = async (req: Request, res: Response) => {
   const users = await db.prepare('SELECT id, name, email, role, status, avatar_url, created_at FROM users').all();

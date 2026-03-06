@@ -1,9 +1,9 @@
 import { Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import db from '../config/database';
-import { config } from '../config/index';
-import { AuthRequest } from '../middlewares/auth';
+import db from '../config/database.js';
+import { config } from '../config/index.js';
+import { AuthRequest } from '../middlewares/auth.js';
 
 export const register = async (req: AuthRequest, res: Response) => {
   const { name, email, password, role } = req.body;

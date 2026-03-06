@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import db from '../config/database';
+import db from '../config/database.js';
 
 export const getAllCategories = async (req: Request, res: Response) => {
   const categories = await db.prepare('SELECT * FROM categories').all();

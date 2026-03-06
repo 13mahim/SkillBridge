@@ -1,4 +1,4 @@
-import pool from './postgres';
+import pool from './postgres.js';
 
 class DatabaseAdapter {
   // Execute SQL query
