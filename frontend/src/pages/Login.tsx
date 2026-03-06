@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { LogIn, Mail, Lock, GraduationCap } from 'lucide-react';
+import { LogIn, Mail, Lock, GraduationCap, UserPlus } from 'lucide-react';
 import { motion } from 'motion/react';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [showSignupPrompt, setShowSignupPrompt] = useState(false);
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setShowSignupPrompt(false);
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
@@ -28,10 +30,18 @@ export default function Login() {
         const dashboard = data.user.role === 'admin' ? '/admin' : data.user.role === 'tutor' ? '/tutor' : '/dashboard';
         navigate(dashboard);
       } else {
-        setError(data.error || 'Login failed');
+        // Check if error is about user not found
+        if (data.error && (data.error.includes('User not found') || data.error.includes('not found'))) {
+          setShowSignupPrompt(true);
+          setError('');
+        } else {
+          setError(data.error || 'Login failed');
+          setShowSignupPrompt(false);
+        }
       }
     } catch (err) {
       setError('An error occurred');
+      setShowSignupPrompt(false);
     } finally {
       setLoading(false);
     }
@@ -56,6 +66,33 @@ export default function Login() {
           <div className="bg-red-50 text-red-600 p-4 rounded-2xl text-sm font-medium border border-red-100">
             {error}
           </div>
+        )}
+
+        {showSignupPrompt && (
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-emerald-50 border border-emerald-200 p-6 rounded-2xl space-y-4"
+          >
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <UserPlus className="w-5 h-5 text-emerald-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-bold text-emerald-900 mb-1">Account not found</h3>
+                <p className="text-sm text-emerald-700 mb-3">
+                  No account exists with <span className="font-semibold">{email}</span>. Would you like to create one?
+                </p>
+                <Link 
+                  to={`/register?email=${encodeURIComponent(email)}`}
+                  className="inline-flex items-center gap-2 bg-emerald-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  Create Account
+                </Link>
+              </div>
+            </div>
+          </motion.div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
