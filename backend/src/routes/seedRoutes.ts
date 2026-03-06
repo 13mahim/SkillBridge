@@ -6,8 +6,11 @@ const router = Router();
 
 router.post('/seed-tutors', async (req: Request, res: Response) => {
   try {
+    const usePostgres = process.env.DATABASE_URL && process.env.DATABASE_URL.trim() !== '';
+    const placeholder = usePostgres ? '$1' : '?';
+    
     // Check if tutors already exist
-    const tutorCount = await db.prepare('SELECT COUNT(*) as count FROM users WHERE role = $1').get('tutor');
+    const tutorCount = await db.prepare(`SELECT COUNT(*) as count FROM users WHERE role = ${placeholder}`).get('tutor');
     
     if (tutorCount && tutorCount.count > 0) {
       return res.json({ message: 'Tutors already exist', count: tutorCount.count });
@@ -26,12 +29,22 @@ router.post('/seed-tutors', async (req: Request, res: Response) => {
     
     let created = 0;
     for (const tutor of tutors) {
-      const result = await db.prepare('INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4)').run(
-        tutor.name, tutor.email, tutorPassword, 'tutor'
-      );
-      await db.prepare('INSERT INTO tutor_profiles (user_id, bio, hourly_rate, subjects, rating, review_count) VALUES ($1, $2, $3, $4, $5, $6)').run(
-        result.lastInsertRowid, tutor.bio, tutor.hourly_rate, tutor.subjects, tutor.rating, tutor.review_count
-      );
+      let result;
+      if (usePostgres) {
+        result = await db.prepare('INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4)').run(
+          tutor.name, tutor.email, tutorPassword, 'tutor'
+        );
+        await db.prepare('INSERT INTO tutor_profiles (user_id, bio, hourly_rate, subjects, rating, review_count) VALUES ($1, $2, $3, $4, $5, $6)').run(
+          result.lastInsertRowid, tutor.bio, tutor.hourly_rate, tutor.subjects, tutor.rating, tutor.review_count
+        );
+      } else {
+        result = await db.prepare('INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)').run(
+          tutor.name, tutor.email, tutorPassword, 'tutor'
+        );
+        await db.prepare('INSERT INTO tutor_profiles (user_id, bio, hourly_rate, subjects, rating, review_count) VALUES (?, ?, ?, ?, ?, ?)').run(
+          result.lastInsertRowid, tutor.bio, tutor.hourly_rate, tutor.subjects, tutor.rating, tutor.review_count
+        );
+      }
       created++;
     }
     
