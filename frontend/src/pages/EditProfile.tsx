@@ -1,8 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { apiUrl } from '../config/api';
 import { useAuth } from '../contexts/AuthContext';
+import { apiUrl } from '../config/api';
 import { useNavigate } from 'react-router-dom';
+import { apiUrl } from '../config/api';
 import { User, Mail, Save, ArrowLeft, Camera, Trash2 } from 'lucide-react';
+import { apiUrl } from '../config/api';
 import { motion } from 'motion/react';
+import { apiUrl } from '../config/api';
 
 export default function EditProfile() {
   const { user, setUser } = useAuth();
@@ -100,7 +105,7 @@ export default function EditProfile() {
     setSuccess(false);
 
     try {
-      const res = await fetch('/api/admin/profile', {
+      const res = await fetch(apiUrl('/api/admin/profile', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)

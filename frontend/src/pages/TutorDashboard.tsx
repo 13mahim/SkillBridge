@@ -1,7 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { apiUrl } from '../config/api';
 import { useAuth } from '../contexts/AuthContext';
+import { apiUrl } from '../config/api';
 import { Calendar, Clock, CheckCircle, XCircle, Star, LayoutDashboard, Settings, UserCircle, Camera, Trash2 } from 'lucide-react';
+import { apiUrl } from '../config/api';
 import { motion } from 'motion/react';
+import { apiUrl } from '../config/api';
 
 export default function TutorDashboard() {
   const { user, setUser } = useAuth();
@@ -25,7 +29,7 @@ export default function TutorDashboard() {
 
   const fetchData = async () => {
     const [bookingsRes, tutorRes] = await Promise.all([
-      fetch('/api/bookings'),
+      fetch(apiUrl('/api/bookings'),
       fetch(`/api/tutors/${user?.id}`)
     ]);
     const bookingsData = await bookingsRes.json();
@@ -116,7 +120,7 @@ export default function TutorDashboard() {
     try {
       // Update user avatar first
       if (editData.avatar_url !== user?.avatar_url) {
-        const avatarRes = await fetch('/api/admin/profile', {
+        const avatarRes = await fetch(apiUrl('/api/admin/profile', {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -135,7 +139,7 @@ export default function TutorDashboard() {
       }
 
       // Update tutor profile
-      const res = await fetch('/api/tutors/profile', {
+      const res = await fetch(apiUrl('/api/tutors/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

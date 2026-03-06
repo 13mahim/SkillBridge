@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
+import { apiUrl } from '../config/api';
 import { Link, useNavigate } from 'react-router-dom';
+import { apiUrl } from '../config/api';
 import { useAuth } from '../contexts/AuthContext';
+import { apiUrl } from '../config/api';
 import { UserPlus, Mail, Lock, User, GraduationCap, BookOpen } from 'lucide-react';
+import { apiUrl } from '../config/api';
 import { motion } from 'motion/react';
+import { apiUrl } from '../config/api';
 
 export default function Register() {
   const [name, setName] = useState('');
@@ -19,7 +24,7 @@ export default function Register() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/auth/register', {
+      const res = await fetch(apiUrl('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password, role })
