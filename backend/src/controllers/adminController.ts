@@ -2,32 +2,63 @@ import { Request, Response } from 'express';
 import db from '../config/database.js';
 
 export const getAllUsers = async (req: Request, res: Response) => {
+  const usePostgres = process.env.DATABASE_URL && process.env.DATABASE_URL.trim() !== '';
   const users = await db.prepare('SELECT id, name, email, role, status, avatar_url, created_at FROM users').all();
   res.json(users);
 };
 
 export const updateUserStatus = async (req: Request, res: Response) => {
   const { status } = req.body;
-  await db.prepare('UPDATE users SET status = $1 WHERE id = $2').run(status, req.params.id);
+  const usePostgres = process.env.DATABASE_URL && process.env.DATABASE_URL.trim() !== '';
+  
+  if (usePostgres) {
+    await db.prepare('UPDATE users SET status = $1 WHERE id = $2').run(status, req.params.id);
+  } else {
+    await db.prepare('UPDATE users SET status = ? WHERE id = ?').run(status, req.params.id);
+  }
   res.json({ success: true });
 };
 
 export const deleteUser = async (req: Request, res: Response) => {
   const userId = req.params.id;
+  const usePostgres = process.env.DATABASE_URL && process.env.DATABASE_URL.trim() !== '';
+  const placeholder = usePostgres ? '$1' : '?';
   
   // Check if trying to delete admin
-  const user = await db.prepare('SELECT role FROM users WHERE id = $1').get(userId) as any;
+  const user = await db.prepare(`SELECT role FROM users WHERE id = ${placeholder}`).get(userId) as any;
   if (user?.role === 'admin') {
     return res.status(403).json({ error: 'Cannot delete admin user' });
   }
 
   // Delete related data first
-  await db.prepare('DELETE FROM bookings WHERE student_id = $1 OR tutor_id = $1').run(userId);
-  await db.prepare('DELETE FROM reviews WHERE student_id = $1 OR tutor_id = $1').run(userId);
-  await db.prepare('DELETE FROM tutor_profiles WHERE user_id = $1').run(userId);
+  if (usePostgres) {
+    await db.prepare('DELETE FROM bookings WHERE student_id = $1 OR tutor_id = $1').run(userId);
+    await db.prepare('DELETE FROM reviews WHERE student_id = $1 OR tutor_id = $1').run(userId);
+    await db.prepare('DELETE FROM tutor_profiles WHERE user_id = $1').run(userId);
+    await db.prepare('DELETE FROM users WHERE id = $1').run(userId);
+  } else {
+    await db.prepare('DELETE FROM bookings WHERE student_id = ? OR tutor_id = ?').run(userId, userId);
+    await db.prepare('DELETE FROM reviews WHERE student_id = ? OR tutor_id = ?').run(userId, userId);
+    await db.prepare('DELETE FROM tutor_profiles WHERE user_id = ?').run(userId);
+    await db.prepare('DELETE FROM users WHERE id = ?').run(userId);
+  }
   
-  // Delete user
-  await db.prepare('DELETE FROM users WHERE id = $1').run(userId);
+  res.json({ success: true });
+};
+
+export const deleteBooking = async (req: Request, res: Response) => {
+  const bookingId = req.params.id;
+  const usePostgres = process.env.DATABASE_URL && process.env.DATABASE_URL.trim() !== '';
+  const placeholder = usePostgres ? '$1' : '?';
+  
+  // Delete related reviews first
+  if (usePostgres) {
+    await db.prepare('DELETE FROM reviews WHERE booking_id = $1').run(bookingId);
+    await db.prepare('DELETE FROM bookings WHERE id = $1').run(bookingId);
+  } else {
+    await db.prepare('DELETE FROM reviews WHERE booking_id = ?').run(bookingId);
+    await db.prepare('DELETE FROM bookings WHERE id = ?').run(bookingId);
+  }
   
   res.json({ success: true });
 };
@@ -35,20 +66,36 @@ export const deleteUser = async (req: Request, res: Response) => {
 export const updateProfile = async (req: Request, res: Response) => {
   const userId = (req as any).user.id;
   const { name, email, avatar_url } = req.body;
+  const usePostgres = process.env.DATABASE_URL && process.env.DATABASE_URL.trim() !== '';
 
   // Check if email already exists for another user
-  const existingUser = await db.prepare('SELECT id FROM users WHERE email = $1 AND id != $2').get(email, userId) as any;
+  let existingUser;
+  if (usePostgres) {
+    existingUser = await db.prepare('SELECT id FROM users WHERE email = $1 AND id != $2').get(email, userId) as any;
+  } else {
+    existingUser = await db.prepare('SELECT id FROM users WHERE email = ? AND id != ?').get(email, userId) as any;
+  }
+  
   if (existingUser) {
     return res.status(400).json({ error: 'Email already in use' });
   }
 
   // Update user with avatar_url if provided
-  if (avatar_url !== undefined) {
-    await db.prepare('UPDATE users SET name = $1, email = $2, avatar_url = $3 WHERE id = $4').run(name, email, avatar_url, userId);
+  if (usePostgres) {
+    if (avatar_url !== undefined) {
+      await db.prepare('UPDATE users SET name = $1, email = $2, avatar_url = $3 WHERE id = $4').run(name, email, avatar_url, userId);
+    } else {
+      await db.prepare('UPDATE users SET name = $1, email = $2 WHERE id = $3').run(name, email, userId);
+    }
+    const updatedUser = await db.prepare('SELECT id, name, email, role, avatar_url, created_at FROM users WHERE id = $1').get(userId);
+    res.json(updatedUser);
   } else {
-    await db.prepare('UPDATE users SET name = $1, email = $2 WHERE id = $3').run(name, email, userId);
+    if (avatar_url !== undefined) {
+      await db.prepare('UPDATE users SET name = ?, email = ?, avatar_url = ? WHERE id = ?').run(name, email, avatar_url, userId);
+    } else {
+      await db.prepare('UPDATE users SET name = ?, email = ? WHERE id = ?').run(name, email, userId);
+    }
+    const updatedUser = await db.prepare('SELECT id, name, email, role, avatar_url, created_at FROM users WHERE id = ?').get(userId);
+    res.json(updatedUser);
   }
-  
-  const updatedUser = await db.prepare('SELECT id, name, email, role, avatar_url, created_at FROM users WHERE id = $1').get(userId);
-  res.json(updatedUser);
 };

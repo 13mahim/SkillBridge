@@ -470,20 +470,59 @@ export default function AdminDashboard() {
           {activeTab === 'bookings' && (
             <div className="space-y-4">
               {bookings.map(b => (
-                <div key={b.id} className="flex items-center justify-between p-4 bg-neutral-50 rounded-2xl">
-                  <div>
+                <div key={b.id} className="flex items-center justify-between p-4 bg-neutral-50 rounded-2xl hover:bg-neutral-100 transition-colors group">
+                  <div className="flex-1">
                     <div className="font-bold">{b.student_name} → {b.tutor_name}</div>
                     <div className="text-xs text-neutral-400">
-                      {new Date(b.start_time).toLocaleString()}
+                      {new Date(b.start_time).toLocaleString()} • ${b.total_price}
                     </div>
                   </div>
-                  <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase ${
-                    b.status === 'confirmed' ? 'bg-blue-50 text-blue-600' :
-                    b.status === 'completed' ? 'bg-emerald-50 text-emerald-600' :
-                    'bg-red-50 text-red-600'
-                  }`}>
-                    {b.status}
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <span className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase ${
+                      b.status === 'confirmed' ? 'bg-blue-50 text-blue-600' :
+                      b.status === 'completed' ? 'bg-emerald-50 text-emerald-600' :
+                      'bg-red-50 text-red-600'
+                    }`}>
+                      {b.status}
+                    </span>
+                    {b.status !== 'cancelled' && (
+                      <button 
+                        onClick={async () => {
+                          if (confirm(`Cancel booking from ${b.student_name} to ${b.tutor_name}?`)) {
+                            const res = await fetch(`/api/bookings/${b.id}/status`, {
+                              method: 'PATCH',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ status: 'cancelled' })
+                            });
+                            if (res.ok) fetchData();
+                          }
+                        }}
+                        className="p-2 rounded-xl text-orange-600 hover:bg-orange-50 transition-colors opacity-0 group-hover:opacity-100"
+                        title="Cancel Booking"
+                      >
+                        <ShieldAlert className="w-5 h-5" />
+                      </button>
+                    )}
+                    <button 
+                      onClick={async () => {
+                        if (confirm(`Delete this booking permanently? This cannot be undone.`)) {
+                          const res = await fetch(`/api/admin/bookings/${b.id}`, {
+                            method: 'DELETE'
+                          });
+                          if (res.ok) {
+                            alert('Booking deleted successfully');
+                            fetchData();
+                          } else {
+                            alert('Failed to delete booking');
+                          }
+                        }
+                      }}
+                      className="p-2 rounded-xl text-red-600 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100"
+                      title="Delete Booking"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
