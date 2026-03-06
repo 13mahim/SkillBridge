@@ -18,13 +18,13 @@ async function startServer() {
   const app = express();
 
   // Initialize database
-  initDb();
+  await initDb();
 
   // Seed Admin if not exists
-  const adminExists = db.prepare('SELECT * FROM users WHERE role = ?').get('admin');
+  const adminExists = await db.prepare('SELECT * FROM users WHERE role = $1').get('admin');
   if (!adminExists) {
     const hashedPassword = await bcrypt.hash('admin123', 10);
-    db.prepare('INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)').run(
+    await db.prepare('INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4)').run(
       'System Admin',
       'admin@skillbridge.com',
       hashedPassword,
