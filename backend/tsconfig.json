@@ -12,6 +12,6 @@
     "strict": true,
     "skipLibCheck": true
   },
-  "include": ["server.ts", "seed.ts", "backend/**/*"],
-  "exclude": ["node_modules", "frontend"]
+  "include": ["src/**/*", "seed.ts", "migrate-avatar.ts"],
+  "exclude": ["node_modules"]
 }
