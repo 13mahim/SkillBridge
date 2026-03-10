@@ -104,6 +104,10 @@ async function startServer() {
 
   // Root endpoint
   app.get('/', (req, res) => {
+    const frontendUrl = config.nodeEnv === 'production' 
+      ? 'https://frontend-eta-five-90.vercel.app' 
+      : 'http://localhost:5173';
+    
     res.send(`
       <!DOCTYPE html>
       <html>
@@ -172,7 +176,7 @@ async function startServer() {
             <p>Backend API server for SkillBridge tutoring platform</p>
             
             <div class="links">
-              <a href="http://localhost:5173" target="_blank">Open Frontend →</a>
+              <a href="${frontendUrl}" target="_blank">Open Frontend →</a>
               <a href="/health">Health Check</a>
             </div>
 
