@@ -25,15 +25,15 @@ npm run dev:frontend
 ```
 
 ### Access
-- **Frontend:** http://localhost:5173
-- **Backend API:** http://localhost:3000
+- **Frontend:** https://frontend-eta-five-90.vercel.app
+- **Backend API:** https://backend-ochre-six.vercel.app
 
 ## 📁 Project Structure
 
 ```
 SkillBridge/
-├── backend/          # Express API (Port 3000)
-├── frontend/         # React App (Port 5173)
+├── backend/          # Express API 
+├── frontend/         # React App 
 ├── SETUP.md          # Detailed setup guide
 └── README.md         # This file
 ```
@@ -58,8 +58,8 @@ SkillBridge/
 
 ## 🛠️ Tech Stack
 
-**Frontend:** React 19, TypeScript, Tailwind CSS, Framer Motion
-**Backend:** Express.js, SQLite, JWT Auth
+**Frontend:** Next.js, TypeScript, Tailwind CSS
+**Backend:** Express.js, Node.js , JWT Auth
 
 ## 📚 Documentation
 

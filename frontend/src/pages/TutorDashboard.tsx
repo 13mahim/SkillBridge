@@ -361,7 +361,7 @@ export default function TutorDashboard() {
           </div>
 
           <div className="space-y-6">
-            <div className="bg-white p-8 rounded-[2rem] border border-neutral-200 space-y-8">
+            <div className="bg-white p-8 rounded-4xl border border-neutral-200 space-y-8">
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-2xl overflow-hidden">
                   {user?.avatar_url ? (

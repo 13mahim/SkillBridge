@@ -82,7 +82,7 @@ export default function TutorProfile() {
       </button>
 
       <div className="bg-white rounded-[3rem] border border-neutral-200 overflow-hidden shadow-lg">
-        <div className="h-64 bg-gradient-to-br from-emerald-400 to-emerald-600 relative">
+        <div className="h-64 bg-linear-to-br from-emerald-400 to-emerald-600 relative">
           {tutor.avatar_url ? (
             <img 
               src={tutor.avatar_url} 
@@ -92,7 +92,7 @@ export default function TutorProfile() {
           ) : (
             <div className="w-full h-full" />
           )}
-          <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/60 to-transparent">
+          <div className="absolute bottom-0 left-0 right-0 p-8 bg-linear-to-t from-black/60 to-transparent">
             <div className="flex items-end justify-between">
               <div className="flex items-center gap-6">
                 <div className="w-32 h-32 rounded-3xl bg-white overflow-hidden border-4 border-white shadow-xl">
@@ -195,7 +195,7 @@ export default function TutorProfile() {
             </div>
 
             <div className="space-y-6">
-              <div className="bg-neutral-50 p-8 rounded-[2rem] border border-neutral-100 sticky top-8 space-y-6">
+              <div className="bg-neutral-50 p-8 rounded-4xl border border-neutral-100 sticky top-8 space-y-6">
                 <h3 className="text-xl font-bold">Book a Session</h3>
                 
                 {user && user.role === 'student' ? (
@@ -233,6 +233,15 @@ export default function TutorProfile() {
                       <div className="font-bold">{Number(tutor.rating || 0).toFixed(1)} ({tutor.review_count} reviews)</div>
                     </div>
                   </div>
+                  {tutor.email && (
+                    <div className="flex items-center gap-3 text-neutral-600">
+                      <MapPin className="w-5 h-5 text-emerald-600" />
+                      <div>
+                        <div className="text-xs text-neutral-400 uppercase font-bold">Contact</div>
+                        <div className="font-medium text-sm break-all">{tutor.email}</div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -242,7 +251,7 @@ export default function TutorProfile() {
 
       {/* Booking Modal */}
       {showBooking && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-100 p-4">
           <motion.div 
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}

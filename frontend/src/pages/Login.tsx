@@ -75,7 +75,7 @@ export default function Login() {
             className="bg-emerald-50 border border-emerald-200 p-6 rounded-2xl space-y-4"
           >
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center shrink-0">
                 <UserPlus className="w-5 h-5 text-emerald-600" />
               </div>
               <div className="flex-1">

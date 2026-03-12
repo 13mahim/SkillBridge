@@ -49,7 +49,7 @@ export default function Home() {
                 className="object-cover w-full h-full mix-blend-multiply opacity-80"
                 referrerPolicy="no-referrer"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-emerald-900/40 to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-emerald-900/40 to-transparent" />
             </div>
             {/* Floating Stats */}
             <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-2xl shadow-xl border border-neutral-100">
