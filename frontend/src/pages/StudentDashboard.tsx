@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Calendar, Clock, CheckCircle, XCircle, Star, LayoutDashboard, BookOpen, User } from 'lucide-react';
+import { Calendar, Clock, Star, BookOpen } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
 
@@ -11,7 +11,7 @@ export default function StudentDashboard() {
   const [reviewingBooking, setReviewingBooking] = useState<any>(null);
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
-  const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
+  const [activeTab, setActiveTab] = useState<'overview' | 'completed' | 'upcoming' | 'hours' | 'subjects'>('overview');
 
   useEffect(() => {
     fetchBookings();
@@ -88,7 +88,10 @@ export default function StudentDashboard() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white p-6 rounded-2xl border border-neutral-200">
+          <button 
+            onClick={() => setActiveTab('completed')}
+            className="bg-white p-6 rounded-2xl border border-neutral-200 hover:border-emerald-600 hover:shadow-lg transition-all cursor-pointer text-left"
+          >
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
                 <Calendar className="w-5 h-5 text-emerald-600" />
@@ -97,9 +100,12 @@ export default function StudentDashboard() {
             <div className="text-3xl font-bold mb-1">{completedSessions}</div>
             <div className="text-xs text-neutral-500 uppercase tracking-wider">Total Sessions</div>
             <div className="text-xs text-neutral-400 mt-1">Completed sessions</div>
-          </div>
+          </button>
 
-          <div className="bg-white p-6 rounded-2xl border border-neutral-200">
+          <button 
+            onClick={() => setActiveTab('upcoming')}
+            className="bg-white p-6 rounded-2xl border border-neutral-200 hover:border-emerald-600 hover:shadow-lg transition-all cursor-pointer text-left"
+          >
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
                 <Clock className="w-5 h-5 text-emerald-600" />
@@ -108,9 +114,12 @@ export default function StudentDashboard() {
             <div className="text-3xl font-bold mb-1">{upcomingSessions}</div>
             <div className="text-xs text-neutral-500 uppercase tracking-wider">Upcoming</div>
             <div className="text-xs text-neutral-400 mt-1">Scheduled sessions</div>
-          </div>
+          </button>
 
-          <div className="bg-white p-6 rounded-2xl border border-neutral-200">
+          <button 
+            onClick={() => setActiveTab('hours')}
+            className="bg-white p-6 rounded-2xl border border-neutral-200 hover:border-emerald-600 hover:shadow-lg transition-all cursor-pointer text-left"
+          >
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
                 <Clock className="w-5 h-5 text-emerald-600" />
@@ -119,9 +128,12 @@ export default function StudentDashboard() {
             <div className="text-3xl font-bold mb-1">{totalHours}</div>
             <div className="text-xs text-neutral-500 uppercase tracking-wider">Hours Learned</div>
             <div className="text-xs text-neutral-400 mt-1">Total learning hours</div>
-          </div>
+          </button>
 
-          <div className="bg-white p-6 rounded-2xl border border-neutral-200">
+          <button 
+            onClick={() => setActiveTab('subjects')}
+            className="bg-white p-6 rounded-2xl border border-neutral-200 hover:border-emerald-600 hover:shadow-lg transition-all cursor-pointer text-left"
+          >
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
                 <BookOpen className="w-5 h-5 text-emerald-600" />
@@ -130,7 +142,7 @@ export default function StudentDashboard() {
             <div className="text-3xl font-bold mb-1">{uniqueSubjects}</div>
             <div className="text-xs text-neutral-500 uppercase tracking-wider">Subjects</div>
             <div className="text-xs text-neutral-400 mt-1">Different subjects</div>
-          </div>
+          </button>
         </div>
 
         {/* Main Content */}
@@ -139,42 +151,205 @@ export default function StudentDashboard() {
           <div className="md:col-span-2 bg-white rounded-3xl border border-neutral-200 overflow-hidden">
             <div className="p-6 border-b border-neutral-100 flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-bold">My Bookings</h2>
-                <p className="text-sm text-neutral-500">Manage your upcoming and past sessions</p>
+                <h2 className="text-xl font-bold">My Learning Journey</h2>
+                <p className="text-sm text-neutral-500">Track your progress and manage sessions</p>
               </div>
               <Link to="/tutors" className="text-sm text-emerald-600 hover:text-emerald-700 font-medium">
-                View All →
+                Find Tutors →
               </Link>
             </div>
 
             {/* Tabs */}
-            <div className="flex border-b border-neutral-100">
+            <div className="flex border-b border-neutral-100 overflow-x-auto">
+              <button
+                onClick={() => setActiveTab('overview')}
+                className={`px-6 py-4 text-sm font-medium transition-colors whitespace-nowrap ${
+                  activeTab === 'overview'
+                    ? 'text-emerald-600 border-b-2 border-emerald-600'
+                    : 'text-neutral-400'
+                }`}
+              >
+                Overview
+              </button>
+              <button
+                onClick={() => setActiveTab('completed')}
+                className={`px-6 py-4 text-sm font-medium transition-colors whitespace-nowrap ${
+                  activeTab === 'completed'
+                    ? 'text-emerald-600 border-b-2 border-emerald-600'
+                    : 'text-neutral-400'
+                }`}
+              >
+                Completed ({completedSessions})
+              </button>
               <button
                 onClick={() => setActiveTab('upcoming')}
-                className={`flex-1 px-6 py-4 text-sm font-medium transition-colors ${
+                className={`px-6 py-4 text-sm font-medium transition-colors whitespace-nowrap ${
                   activeTab === 'upcoming'
                     ? 'text-emerald-600 border-b-2 border-emerald-600'
                     : 'text-neutral-400'
                 }`}
               >
-                Upcoming ({upcomingBookings.length})
+                Upcoming ({upcomingSessions})
               </button>
               <button
-                onClick={() => setActiveTab('past')}
-                className={`flex-1 px-6 py-4 text-sm font-medium transition-colors ${
-                  activeTab === 'past'
+                onClick={() => setActiveTab('hours')}
+                className={`px-6 py-4 text-sm font-medium transition-colors whitespace-nowrap ${
+                  activeTab === 'hours'
                     ? 'text-emerald-600 border-b-2 border-emerald-600'
                     : 'text-neutral-400'
                 }`}
               >
-                Past ({pastBookings.length})
+                Hours
+              </button>
+              <button
+                onClick={() => setActiveTab('subjects')}
+                className={`px-6 py-4 text-sm font-medium transition-colors whitespace-nowrap ${
+                  activeTab === 'subjects'
+                    ? 'text-emerald-600 border-b-2 border-emerald-600'
+                    : 'text-neutral-400'
+                }`}
+              >
+                Subjects
               </button>
             </div>
 
-            {/* Bookings List */}
+            {/* Tab Content */}
             <div className="p-6">
               {loading ? (
                 <div className="text-center py-12 text-neutral-400">Loading...</div>
+              ) : activeTab === 'overview' ? (
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="font-bold mb-4">Upcoming Sessions</h3>
+                    {upcomingBookings.length > 0 ? (
+                      <div className="space-y-4">
+                        {upcomingBookings.slice(0, 3).map((booking) => (
+                          <div key={booking.id} className="flex items-center justify-between p-4 bg-neutral-50 rounded-2xl">
+                            <div className="flex items-center gap-4">
+                              <div className="w-12 h-12 rounded-xl overflow-hidden">
+                                {booking.tutor_avatar ? (
+                                  <img 
+                                    src={booking.tutor_avatar} 
+                                    alt={booking.tutor_name}
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="w-full h-full bg-emerald-600 text-white flex items-center justify-center font-bold">
+                                    {booking.tutor_name?.charAt(0).toUpperCase()}
+                                  </div>
+                                )}
+                              </div>
+                              <div>
+                                <div className="font-bold">{booking.tutor_name}</div>
+                                <div className="text-xs text-neutral-500">
+                                  {new Date(booking.start_time).toLocaleDateString()} • {new Date(booking.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </div>
+                              </div>
+                            </div>
+                            <button 
+                              onClick={() => handleCancel(booking.id)}
+                              className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors text-sm"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-neutral-400">No upcoming sessions</div>
+                    )}
+                  </div>
+                  <div>
+                    <h3 className="font-bold mb-4">Recent Completed</h3>
+                    {bookings.filter(b => b.status === 'completed').length > 0 ? (
+                      <div className="space-y-4">
+                        {bookings.filter(b => b.status === 'completed').slice(0, 3).map((booking) => (
+                          <div key={booking.id} className="flex items-center justify-between p-4 bg-neutral-50 rounded-2xl">
+                            <div className="flex items-center gap-4">
+                              <div className="w-12 h-12 rounded-xl overflow-hidden">
+                                {booking.tutor_avatar ? (
+                                  <img 
+                                    src={booking.tutor_avatar} 
+                                    alt={booking.tutor_name}
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="w-full h-full bg-emerald-600 text-white flex items-center justify-center font-bold">
+                                    {booking.tutor_name?.charAt(0).toUpperCase()}
+                                  </div>
+                                )}
+                              </div>
+                              <div>
+                                <div className="font-bold">{booking.tutor_name}</div>
+                                <div className="text-xs text-neutral-500">
+                                  {new Date(booking.start_time).toLocaleDateString()}
+                                </div>
+                              </div>
+                            </div>
+                            {!booking.reviewed && (
+                              <button 
+                                onClick={() => setReviewingBooking(booking)}
+                                className="bg-emerald-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-emerald-700 transition-colors"
+                              >
+                                Review
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-neutral-400">No completed sessions yet</div>
+                    )}
+                  </div>
+                </div>
+              ) : activeTab === 'completed' ? (
+                bookings.filter(b => b.status === 'completed').length > 0 ? (
+                  <div className="space-y-4">
+                    {bookings.filter(b => b.status === 'completed').map((booking) => (
+                      <div key={booking.id} className="flex items-center justify-between p-4 bg-neutral-50 rounded-2xl">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-xl overflow-hidden">
+                            {booking.tutor_avatar ? (
+                              <img 
+                                src={booking.tutor_avatar} 
+                                alt={booking.tutor_name}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-emerald-600 text-white flex items-center justify-center font-bold">
+                                {booking.tutor_name?.charAt(0).toUpperCase()}
+                              </div>
+                            )}
+                          </div>
+                          <div>
+                            <div className="font-bold">{booking.tutor_name}</div>
+                            <div className="text-xs text-neutral-500">
+                              {new Date(booking.start_time).toLocaleDateString()} • {new Date(booking.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </div>
+                          </div>
+                        </div>
+                        {!booking.reviewed && (
+                          <button 
+                            onClick={() => setReviewingBooking(booking)}
+                            className="bg-emerald-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-emerald-700 transition-colors"
+                          >
+                            Review
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="text-neutral-400 mb-4">No completed sessions yet</div>
+                    <Link 
+                      to="/tutors"
+                      className="inline-block bg-emerald-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-emerald-700 transition-colors"
+                    >
+                      Find a Tutor
+                    </Link>
+                  </div>
+                )
               ) : activeTab === 'upcoming' ? (
                 upcomingBookings.length > 0 ? (
                   <div className="space-y-4">
@@ -212,7 +387,7 @@ export default function StudentDashboard() {
                   </div>
                 ) : (
                   <div className="text-center py-12">
-                    <div className="text-neutral-400 mb-4">No upcoming bookings</div>
+                    <div className="text-neutral-400 mb-4">No upcoming sessions</div>
                     <Link 
                       to="/tutors"
                       className="inline-block bg-emerald-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-emerald-700 transition-colors"
@@ -221,47 +396,96 @@ export default function StudentDashboard() {
                     </Link>
                   </div>
                 )
-              ) : (
-                pastBookings.length > 0 ? (
-                  <div className="space-y-4">
-                    {pastBookings.map((booking) => (
-                      <div key={booking.id} className="flex items-center justify-between p-4 bg-neutral-50 rounded-2xl">
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 rounded-xl overflow-hidden">
-                            {booking.tutor_avatar ? (
-                              <img 
-                                src={booking.tutor_avatar} 
-                                alt={booking.tutor_name}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full bg-emerald-600 text-white flex items-center justify-center font-bold">
-                                {booking.tutor_name?.charAt(0).toUpperCase()}
-                              </div>
-                            )}
-                          </div>
-                          <div>
-                            <div className="font-bold">{booking.tutor_name}</div>
-                            <div className="text-xs text-neutral-500">
-                              {new Date(booking.start_time).toLocaleDateString()}
-                            </div>
-                          </div>
-                        </div>
-                        {booking.status === 'completed' && !booking.reviewed && (
-                          <button 
-                            onClick={() => setReviewingBooking(booking)}
-                            className="bg-emerald-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-emerald-700 transition-colors"
-                          >
-                            Review
-                          </button>
-                        )}
-                      </div>
-                    ))}
+              ) : activeTab === 'hours' ? (
+                <div className="space-y-6">
+                  <div className="text-center py-8">
+                    <div className="text-6xl font-bold text-emerald-600 mb-2">{totalHours}</div>
+                    <div className="text-neutral-500">Total Hours Learned</div>
                   </div>
-                ) : (
-                  <div className="text-center py-12 text-neutral-400">No past bookings</div>
-                )
-              )}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-emerald-50 p-6 rounded-2xl text-center">
+                      <div className="text-3xl font-bold text-emerald-600 mb-1">{completedSessions}</div>
+                      <div className="text-sm text-neutral-600">Sessions Completed</div>
+                    </div>
+                    <div className="bg-emerald-50 p-6 rounded-2xl text-center">
+                      <div className="text-3xl font-bold text-emerald-600 mb-1">{completedSessions > 0 ? (totalHours / completedSessions).toFixed(1) : 0}</div>
+                      <div className="text-sm text-neutral-600">Avg Hours/Session</div>
+                    </div>
+                  </div>
+                  {bookings.filter(b => b.status === 'completed').length > 0 && (
+                    <div>
+                      <h3 className="font-bold mb-4">Learning History</h3>
+                      <div className="space-y-3">
+                        {bookings.filter(b => b.status === 'completed').map((booking) => (
+                          <div key={booking.id} className="flex items-center justify-between p-4 bg-neutral-50 rounded-2xl">
+                            <div className="flex items-center gap-3">
+                              <Clock className="w-5 h-5 text-emerald-600" />
+                              <div>
+                                <div className="font-medium">{booking.tutor_name}</div>
+                                <div className="text-xs text-neutral-500">
+                                  {new Date(booking.start_time).toLocaleDateString()}
+                                </div>
+                              </div>
+                            </div>
+                            <div className="text-sm font-medium text-emerald-600">1 hour</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : activeTab === 'subjects' ? (
+                <div className="space-y-6">
+                  <div className="text-center py-8">
+                    <div className="text-6xl font-bold text-emerald-600 mb-2">{uniqueSubjects}</div>
+                    <div className="text-neutral-500">Different Tutors</div>
+                  </div>
+                  {bookings.length > 0 && (
+                    <div>
+                      <h3 className="font-bold mb-4">Your Tutors</h3>
+                      <div className="grid grid-cols-1 gap-4">
+                        {Array.from(new Set(bookings.map(b => b.tutor_id))).map((tutorId) => {
+                          const tutorBookings = bookings.filter(b => b.tutor_id === tutorId);
+                          const firstBooking = tutorBookings[0];
+                          const completedCount = tutorBookings.filter(b => b.status === 'completed').length;
+                          
+                          return (
+                            <div key={tutorId} className="flex items-center justify-between p-4 bg-neutral-50 rounded-2xl">
+                              <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-xl overflow-hidden">
+                                  {firstBooking.tutor_avatar ? (
+                                    <img 
+                                      src={firstBooking.tutor_avatar} 
+                                      alt={firstBooking.tutor_name}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  ) : (
+                                    <div className="w-full h-full bg-emerald-600 text-white flex items-center justify-center font-bold">
+                                      {firstBooking.tutor_name?.charAt(0).toUpperCase()}
+                                    </div>
+                                  )}
+                                </div>
+                                <div>
+                                  <div className="font-bold">{firstBooking.tutor_name}</div>
+                                  <div className="text-xs text-neutral-500">
+                                    {completedCount} session{completedCount !== 1 ? 's' : ''} completed
+                                  </div>
+                                </div>
+                              </div>
+                              <Link 
+                                to={`/tutors/${tutorId}`}
+                                className="text-emerald-600 hover:text-emerald-700 text-sm font-medium"
+                              >
+                                View Profile →
+                              </Link>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : null}
             </div>
           </div>
 
