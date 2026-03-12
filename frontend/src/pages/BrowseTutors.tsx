@@ -25,7 +25,11 @@ export default function BrowseTutors() {
     fetch(`/api/tutors?${params.toString()}`)
       .then(res => res.json())
       .then(data => {
-        setTutors(data);
+        // Sort tutors alphabetically by name (A-Z)
+        const sortedTutors = data.sort((a: any, b: any) => 
+          a.name.localeCompare(b.name)
+        );
+        setTutors(sortedTutors);
         setLoading(false);
       });
   }, [search, selectedCategory]);

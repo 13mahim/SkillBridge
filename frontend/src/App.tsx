@@ -25,9 +25,9 @@ const PrivateRoute = ({ children, roles }: { children: React.ReactNode, roles?: 
 
 function AppRoutes() {
   return (
-    <div className="min-h-screen bg-neutral-50 font-sans text-neutral-900">
+    <div className="flex flex-col min-h-screen bg-neutral-50 font-sans text-neutral-900">
       <Navbar />
-      <main className="container mx-auto px-4 py-8">
+      <main className="flex-1 container mx-auto px-4 py-8">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/tutors" element={<BrowseTutors />} />

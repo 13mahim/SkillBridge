@@ -63,7 +63,7 @@ export default function StudentDashboard() {
   const pastBookings = bookings.filter(b => b.status === 'completed' || b.status === 'cancelled');
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div>
       <div className="container mx-auto px-4 py-8 space-y-8">
         {/* Header */}
           <div className="flex items-center justify-between">
