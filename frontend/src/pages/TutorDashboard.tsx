@@ -7,6 +7,7 @@ export default function TutorDashboard() {
   const { user, setUser } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [bookings, setBookings] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<any[]>([]);
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -24,14 +25,17 @@ export default function TutorDashboard() {
   }, []);
 
   const fetchData = async () => {
-    const [bookingsRes, tutorRes] = await Promise.all([
+    const [bookingsRes, tutorRes, reviewsRes] = await Promise.all([
       fetch('/api/bookings'),
-      fetch(`/api/tutors/${user?.id}`)
+      fetch(`/api/tutors/${user?.id}`),
+      fetch('/api/reviews/my-reviews')
     ]);
     const bookingsData = await bookingsRes.json();
     const tutorData = await tutorRes.json();
+    const reviewsData = await reviewsRes.json();
     setBookings(bookingsData);
     setProfile(tutorData);
+    setReviews(reviewsData);
     setPreviewUrl(user?.avatar_url || '');
     setEditData({
       bio: tutorData.bio || '',
@@ -406,6 +410,44 @@ export default function TutorDashboard() {
                   ))}
                 </div>
               </div>
+            </div>
+
+            {/* Reviews Section */}
+            <div className="bg-white p-8 rounded-4xl border border-neutral-200 space-y-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-bold flex items-center gap-2">
+                  <Star className="w-5 h-5 text-yellow-500" />
+                  Student Reviews ({reviews.length})
+                </h3>
+                <div className="text-sm text-neutral-500">
+                  Average: {Number(profile?.rating || 0).toFixed(1)} ⭐
+                </div>
+              </div>
+
+              {reviews.length > 0 ? (
+                <div className="space-y-4 max-h-96 overflow-y-auto">
+                  {reviews.map((review: any) => (
+                    <div key={review.id} className="bg-neutral-50 p-4 rounded-2xl space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="font-bold">{review.student_name}</div>
+                        <div className="flex items-center gap-1 text-yellow-500">
+                          {[...Array(review.rating)].map((_, i) => (
+                            <Star key={i} className="w-4 h-4 fill-current" />
+                          ))}
+                        </div>
+                      </div>
+                      <p className="text-neutral-600 text-sm">{review.comment}</p>
+                      <div className="text-xs text-neutral-400">
+                        {new Date(review.created_at).toLocaleDateString()}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-neutral-400">
+                  No reviews yet
+                </div>
+              )}
             </div>
           </div>
         </div>

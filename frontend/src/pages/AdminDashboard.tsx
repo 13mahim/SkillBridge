@@ -5,9 +5,10 @@ import { motion } from 'motion/react';
 export default function AdminDashboard() {
   const [users, setUsers] = useState<any[]>([]);
   const [bookings, setBookings] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'all' | 'students' | 'tutors' | 'bookings' | 'categories'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'students' | 'tutors' | 'bookings' | 'reviews' | 'categories'>('all');
   const [newCategory, setNewCategory] = useState({ name: '', slug: '' });
   const [showAddCategory, setShowAddCategory] = useState(false);
 
@@ -16,13 +17,15 @@ export default function AdminDashboard() {
   }, []);
 
   const fetchData = async () => {
-    const [usersRes, bookingsRes, catsRes] = await Promise.all([
+    const [usersRes, bookingsRes, reviewsRes, catsRes] = await Promise.all([
       fetch('/api/admin/users'),
       fetch('/api/bookings'),
+      fetch('/api/reviews/all'),
       fetch('/api/categories')
     ]);
     setUsers(await usersRes.json());
     setBookings(await bookingsRes.json());
+    setReviews(await reviewsRes.json());
     setCategories(await catsRes.json());
     setLoading(false);
   };
@@ -92,7 +95,7 @@ export default function AdminDashboard() {
 
       <div className="bg-white rounded-[2.5rem] border border-neutral-200 overflow-hidden shadow-sm">
         <div className="flex border-b border-neutral-100">
-          {(['all', 'students', 'tutors', 'bookings', 'categories'] as const).map(tab => (
+          {(['all', 'students', 'tutors', 'bookings', 'reviews', 'categories'] as const).map(tab => (
             <button 
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -606,6 +609,36 @@ export default function AdminDashboard() {
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {activeTab === 'reviews' && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold">All Reviews ({reviews.length})</h3>
+              {reviews.length > 0 ? (
+                <div className="space-y-4">
+                  {reviews.map((review: any) => (
+                    <div key={review.id} className="bg-neutral-50 p-6 rounded-2xl space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="font-bold">{review.student_name} → {review.tutor_name}</div>
+                          <div className="text-xs text-neutral-400">
+                            {new Date(review.created_at).toLocaleDateString()}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1 text-yellow-500">
+                          {[...Array(review.rating)].map((_, i) => (
+                            <span key={i} className="text-lg">⭐</span>
+                          ))}
+                        </div>
+                      </div>
+                      <p className="text-neutral-600">{review.comment}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 text-neutral-400">No reviews yet</div>
+              )}
             </div>
           )}
         </div>
