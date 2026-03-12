@@ -5,11 +5,24 @@ import { useEffect, useState } from 'react';
 
 export default function Home() {
   const [featuredTutors, setFeaturedTutors] = useState<any[]>([]);
+  const [heroContent, setHeroContent] = useState<any>({
+    title: 'Unlock Your Potential with Expert Tutors',
+    subtitle: 'Connect with verified experts across 50+ subjects. Personalized learning that fits your schedule and budget.',
+    image_url: 'https://picsum.photos/seed/learning/800/800',
+    button_text: 'Find a Tutor',
+    button_link: '/tutors'
+  });
 
   useEffect(() => {
     fetch('/api/tutors?limit=3')
       .then(res => res.json())
       .then(data => setFeaturedTutors(data.slice(0, 3)));
+    
+    fetch('/api/hero')
+      .then(res => res.json())
+      .then(data => {
+        if (data) setHeroContent(data);
+      });
   }, []);
 
   return (
@@ -23,14 +36,17 @@ export default function Home() {
             className="space-y-8"
           >
             <h1 className="text-6xl font-bold tracking-tight leading-tight text-neutral-900">
-              Unlock Your Potential with <span className="text-emerald-600">Expert Tutors</span>
+              {heroContent.title.split('Expert Tutors')[0]}
+              <span className="text-emerald-600">
+                {heroContent.title.includes('Expert Tutors') ? 'Expert Tutors' : heroContent.title.split(' ').slice(-2).join(' ')}
+              </span>
             </h1>
             <p className="text-xl text-neutral-500 max-w-lg leading-relaxed">
-              Connect with verified experts across 50+ subjects. Personalized learning that fits your schedule and budget.
+              {heroContent.subtitle}
             </p>
             <div className="flex gap-4">
-              <Link to="/tutors" className="bg-emerald-600 text-white px-8 py-4 rounded-2xl font-semibold hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-200 flex items-center gap-2">
-                Find a Tutor <ArrowRight className="w-5 h-5" />
+              <Link to={heroContent.button_link} className="bg-emerald-600 text-white px-8 py-4 rounded-2xl font-semibold hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-200 flex items-center gap-2">
+                {heroContent.button_text} <ArrowRight className="w-5 h-5" />
               </Link>
               <Link to="/register" className="bg-white border border-neutral-200 text-neutral-700 px-8 py-4 rounded-2xl font-semibold hover:bg-neutral-50 transition-all">
                 Become a Tutor
@@ -44,7 +60,7 @@ export default function Home() {
           >
             <div className="aspect-square rounded-3xl bg-emerald-100 overflow-hidden relative">
               <img 
-                src="https://picsum.photos/seed/learning/800/800" 
+                src={heroContent.image_url} 
                 alt="Learning" 
                 className="object-cover w-full h-full mix-blend-multiply opacity-80"
                 referrerPolicy="no-referrer"

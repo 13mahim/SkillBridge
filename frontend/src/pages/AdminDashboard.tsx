@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutDashboard, Users, Calendar as BookingsIcon, Tag, ShieldAlert, ShieldCheck, Trash2, GraduationCap, UserCircle } from 'lucide-react';
+import { LayoutDashboard, GraduationCap, UserCircle, Calendar as BookingsIcon, Tag, ShieldAlert, ShieldCheck, Trash2, Image } from 'lucide-react';
 import { motion } from 'motion/react';
 
 export default function AdminDashboard() {
@@ -7,26 +7,46 @@ export default function AdminDashboard() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
+  const [heroContent, setHeroContent] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'all' | 'students' | 'tutors' | 'bookings' | 'reviews' | 'categories'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'students' | 'tutors' | 'bookings' | 'reviews' | 'categories' | 'hero'>('all');
   const [newCategory, setNewCategory] = useState({ name: '', slug: '' });
   const [showAddCategory, setShowAddCategory] = useState(false);
+  const [heroForm, setHeroForm] = useState({
+    title: '',
+    subtitle: '',
+    image_url: '',
+    button_text: 'Find a Tutor',
+    button_link: '/tutors'
+  });
 
   useEffect(() => {
     fetchData();
   }, []);
 
   const fetchData = async () => {
-    const [usersRes, bookingsRes, reviewsRes, catsRes] = await Promise.all([
+    const [usersRes, bookingsRes, reviewsRes, catsRes, heroRes] = await Promise.all([
       fetch('/api/admin/users'),
       fetch('/api/bookings'),
       fetch('/api/reviews/all'),
-      fetch('/api/categories')
+      fetch('/api/categories'),
+      fetch('/api/hero')
     ]);
     setUsers(await usersRes.json());
     setBookings(await bookingsRes.json());
     setReviews(await reviewsRes.json());
     setCategories(await catsRes.json());
+    const hero = await heroRes.json();
+    setHeroContent(hero);
+    if (hero) {
+      setHeroForm({
+        title: hero.title,
+        subtitle: hero.subtitle,
+        image_url: hero.image_url,
+        button_text: hero.button_text || 'Find a Tutor',
+        button_link: hero.button_link || '/tutors'
+      });
+    }
     setLoading(false);
   };
 
@@ -94,12 +114,12 @@ export default function AdminDashboard() {
       </div>
 
       <div className="bg-white rounded-[2.5rem] border border-neutral-200 overflow-hidden shadow-sm">
-        <div className="flex border-b border-neutral-100">
-          {(['all', 'students', 'tutors', 'bookings', 'reviews', 'categories'] as const).map(tab => (
+        <div className="flex border-b border-neutral-100 overflow-x-auto">
+          {(['all', 'students', 'tutors', 'bookings', 'reviews', 'categories', 'hero'] as const).map(tab => (
             <button 
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-8 py-5 font-bold text-sm uppercase tracking-wider transition-all border-b-2 ${
+              className={`px-8 py-5 font-bold text-sm uppercase tracking-wider transition-all border-b-2 whitespace-nowrap ${
                 activeTab === tab ? 'border-emerald-600 text-emerald-600 bg-emerald-50/30' : 'border-transparent text-neutral-400 hover:text-neutral-600'
               }`}
             >
@@ -639,6 +659,149 @@ export default function AdminDashboard() {
               ) : (
                 <div className="text-center py-12 text-neutral-400">No reviews yet</div>
               )}
+            </div>
+          )}
+
+          {activeTab === 'hero' && (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-bold flex items-center gap-2">
+                    <Image className="w-5 h-5 text-emerald-600" />
+                    Hero Section Content
+                  </h3>
+                  <p className="text-sm text-neutral-500 mt-1">Manage the homepage hero section</p>
+                </div>
+              </div>
+
+              {/* Current Hero Preview */}
+              {heroContent && (
+                <div className="bg-neutral-50 p-6 rounded-2xl border border-neutral-200">
+                  <h4 className="font-bold mb-4">Current Hero Content</h4>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-3">
+                      <div>
+                        <div className="text-xs text-neutral-400 uppercase tracking-wider mb-1">Title</div>
+                        <div className="font-bold">{heroContent.title}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-neutral-400 uppercase tracking-wider mb-1">Subtitle</div>
+                        <div className="text-sm text-neutral-600">{heroContent.subtitle}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-neutral-400 uppercase tracking-wider mb-1">Button</div>
+                        <div className="text-sm text-neutral-600">{heroContent.button_text} → {heroContent.button_link}</div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-neutral-400 uppercase tracking-wider mb-2">Image</div>
+                      <img 
+                        src={heroContent.image_url} 
+                        alt="Hero" 
+                        className="w-full h-48 object-cover rounded-xl"
+                        referrerPolicy="no-referrer"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Update Form */}
+              <div className="bg-white p-6 rounded-2xl border border-neutral-200">
+                <h4 className="font-bold mb-4">Update Hero Content</h4>
+                <form onSubmit={async (e) => {
+                  e.preventDefault();
+                  const token = localStorage.getItem('token');
+                  const res = await fetch('/api/hero', {
+                    method: 'PUT',
+                    headers: { 
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(heroForm)
+                  });
+                  if (res.ok) {
+                    alert('Hero content updated successfully!');
+                    fetchData();
+                  } else {
+                    alert('Failed to update hero content');
+                  }
+                }} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">Title</label>
+                    <input 
+                      type="text"
+                      required
+                      className="w-full p-3 rounded-xl border border-neutral-200 focus:ring-2 focus:ring-emerald-500 outline-none"
+                      value={heroForm.title}
+                      onChange={(e) => setHeroForm({...heroForm, title: e.target.value})}
+                      placeholder="Unlock Your Potential with Expert Tutors"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">Subtitle</label>
+                    <textarea 
+                      required
+                      className="w-full p-3 rounded-xl border border-neutral-200 focus:ring-2 focus:ring-emerald-500 outline-none h-24 resize-none"
+                      value={heroForm.subtitle}
+                      onChange={(e) => setHeroForm({...heroForm, subtitle: e.target.value})}
+                      placeholder="Connect with verified experts across 50+ subjects..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">Image URL</label>
+                    <input 
+                      type="url"
+                      required
+                      className="w-full p-3 rounded-xl border border-neutral-200 focus:ring-2 focus:ring-emerald-500 outline-none"
+                      value={heroForm.image_url}
+                      onChange={(e) => setHeroForm({...heroForm, image_url: e.target.value})}
+                      placeholder="https://example.com/image.jpg"
+                    />
+                    {heroForm.image_url && (
+                      <img 
+                        src={heroForm.image_url} 
+                        alt="Preview" 
+                        className="mt-3 w-full h-32 object-cover rounded-xl"
+                        referrerPolicy="no-referrer"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                    )}
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-700 mb-2">Button Text</label>
+                      <input 
+                        type="text"
+                        required
+                        className="w-full p-3 rounded-xl border border-neutral-200 focus:ring-2 focus:ring-emerald-500 outline-none"
+                        value={heroForm.button_text}
+                        onChange={(e) => setHeroForm({...heroForm, button_text: e.target.value})}
+                        placeholder="Find a Tutor"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-700 mb-2">Button Link</label>
+                      <input 
+                        type="text"
+                        required
+                        className="w-full p-3 rounded-xl border border-neutral-200 focus:ring-2 focus:ring-emerald-500 outline-none"
+                        value={heroForm.button_link}
+                        onChange={(e) => setHeroForm({...heroForm, button_link: e.target.value})}
+                        placeholder="/tutors"
+                      />
+                    </div>
+                  </div>
+                  <button 
+                    type="submit"
+                    className="w-full bg-emerald-600 text-white px-6 py-4 rounded-2xl font-bold hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-100"
+                  >
+                    Update Hero Content
+                  </button>
+                </form>
+              </div>
             </div>
           )}
         </div>

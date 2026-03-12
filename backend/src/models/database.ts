@@ -64,7 +64,37 @@ export async function initDb() {
         description TEXT,
         icon TEXT
       );
+
+      CREATE TABLE IF NOT EXISTS hero_content (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        subtitle TEXT NOT NULL,
+        image_url TEXT NOT NULL,
+        button_text TEXT DEFAULT 'Find a Tutor',
+        button_link TEXT DEFAULT '/tutors',
+        is_active INTEGER DEFAULT 1,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      );
     `);
+
+    // Seed default hero content if empty
+    const heroCheck = db.prepare('SELECT COUNT(*) as count FROM hero_content').get() as { count: number };
+    if (heroCheck.count === 0) {
+      db.prepare(`
+        INSERT INTO hero_content (title, subtitle, image_url, button_text, button_link, is_active)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `).run(
+        'Unlock Your Potential with Expert Tutors',
+        'Connect with verified experts across 50+ subjects. Personalized learning that fits your schedule and budget.',
+        'https://picsum.photos/seed/learning/800/800',
+        'Find a Tutor',
+        '/tutors',
+        1
+      );
+      console.log('✅ Default hero content seeded');
+    }
+    
     console.log('✅ SQLite database initialized');
   }
 }

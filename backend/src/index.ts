@@ -14,6 +14,7 @@ import categoryRoutes from './routes/categoryRoutes.js';
 import reviewRoutes from './routes/reviewRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import seedRoutes from './routes/seedRoutes.js';
+import heroRoutes from './routes/heroRoutes.js';
 
 async function startServer() {
   const app = express();
@@ -96,6 +97,7 @@ async function startServer() {
   app.use('/api/reviews', reviewRoutes);
   app.use('/api/admin', adminRoutes);
   app.use('/api/seed', seedRoutes);
+  app.use('/api/hero', heroRoutes);
 
   // Health check
   app.get('/health', (req, res) => {

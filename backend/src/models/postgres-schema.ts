@@ -67,6 +67,38 @@ export async function initPostgresDb() {
       )
     `);
 
+    // Hero Content Table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS hero_content (
+        id SERIAL PRIMARY KEY,
+        title TEXT NOT NULL,
+        subtitle TEXT NOT NULL,
+        image_url TEXT NOT NULL,
+        button_text TEXT DEFAULT 'Find a Tutor',
+        button_link TEXT DEFAULT '/tutors',
+        is_active BOOLEAN DEFAULT true,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // Seed default hero content if empty
+    const heroResult = await client.query('SELECT COUNT(*) as count FROM hero_content');
+    if (parseInt(heroResult.rows[0].count) === 0) {
+      await client.query(`
+        INSERT INTO hero_content (title, subtitle, image_url, button_text, button_link, is_active)
+        VALUES ($1, $2, $3, $4, $5, $6)
+      `, [
+        'Unlock Your Potential with Expert Tutors',
+        'Connect with verified experts across 50+ subjects. Personalized learning that fits your schedule and budget.',
+        'https://picsum.photos/seed/learning/800/800',
+        'Find a Tutor',
+        '/tutors',
+        true
+      ]);
+      console.log('✅ Default hero content seeded');
+    }
+
     // Seed Categories if empty
     const categoriesResult = await client.query('SELECT COUNT(*) as count FROM categories');
     if (parseInt(categoriesResult.rows[0].count) === 0) {
