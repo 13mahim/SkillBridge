@@ -10,7 +10,7 @@ export default function TutorDashboard() {
   const [reviews, setReviews] = useState<any[]>([]);
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
+  const [activeTab, setActiveTab] = useState<'upcoming' | 'past' | 'earnings' | 'reviews'>('upcoming');
 
   useEffect(() => {
     fetchData();
@@ -74,49 +74,61 @@ export default function TutorDashboard() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white p-6 rounded-2xl border border-neutral-200">
+          <button
+            onClick={() => setActiveTab('past')}
+            className="bg-white p-6 rounded-2xl border border-neutral-200 hover:border-emerald-300 hover:shadow-lg transition-all text-left group cursor-pointer"
+          >
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                 <Calendar className="w-5 h-5 text-emerald-600" />
               </div>
             </div>
             <div className="text-3xl font-bold mb-1">{completedSessions}</div>
             <div className="text-xs text-neutral-500 uppercase tracking-wider">Total Sessions</div>
             <div className="text-xs text-neutral-400 mt-1">Completed sessions</div>
-          </div>
+          </button>
 
-          <div className="bg-white p-6 rounded-2xl border border-neutral-200">
+          <button
+            onClick={() => setActiveTab('upcoming')}
+            className="bg-white p-6 rounded-2xl border border-neutral-200 hover:border-emerald-300 hover:shadow-lg transition-all text-left group cursor-pointer"
+          >
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                 <Clock className="w-5 h-5 text-blue-600" />
               </div>
             </div>
             <div className="text-3xl font-bold mb-1">{upcomingSessions}</div>
             <div className="text-xs text-neutral-500 uppercase tracking-wider">Upcoming</div>
             <div className="text-xs text-neutral-400 mt-1">Scheduled sessions</div>
-          </div>
+          </button>
 
-          <div className="bg-white p-6 rounded-2xl border border-neutral-200">
+          <button
+            onClick={() => setActiveTab('earnings')}
+            className="bg-white p-6 rounded-2xl border border-neutral-200 hover:border-emerald-300 hover:shadow-lg transition-all text-left group cursor-pointer"
+          >
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                 <DollarSign className="w-5 h-5 text-green-600" />
               </div>
             </div>
             <div className="text-3xl font-bold mb-1">${totalEarnings.toFixed(0)}</div>
             <div className="text-xs text-neutral-500 uppercase tracking-wider">Total Earnings</div>
             <div className="text-xs text-neutral-400 mt-1">From completed sessions</div>
-          </div>
+          </button>
 
-          <div className="bg-white p-6 rounded-2xl border border-neutral-200">
+          <button
+            onClick={() => setActiveTab('reviews')}
+            className="bg-white p-6 rounded-2xl border border-neutral-200 hover:border-emerald-300 hover:shadow-lg transition-all text-left group cursor-pointer"
+          >
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                 <Star className="w-5 h-5 text-yellow-600" />
               </div>
             </div>
             <div className="text-3xl font-bold mb-1">{averageRating.toFixed(1)}</div>
             <div className="text-xs text-neutral-500 uppercase tracking-wider">Rating</div>
             <div className="text-xs text-neutral-400 mt-1">{profile?.review_count || 0} reviews</div>
-          </div>
+          </button>
         </div>
 
         {/* Main Content */}
@@ -131,10 +143,10 @@ export default function TutorDashboard() {
             </div>
 
             {/* Tabs */}
-            <div className="flex border-b border-neutral-100">
+            <div className="flex border-b border-neutral-100 overflow-x-auto">
               <button
                 onClick={() => setActiveTab('upcoming')}
-                className={`flex-1 px-6 py-4 text-sm font-medium transition-colors ${
+                className={`px-6 py-4 text-sm font-medium transition-colors whitespace-nowrap ${
                   activeTab === 'upcoming'
                     ? 'text-emerald-600 border-b-2 border-emerald-600'
                     : 'text-neutral-400'
@@ -144,13 +156,33 @@ export default function TutorDashboard() {
               </button>
               <button
                 onClick={() => setActiveTab('past')}
-                className={`flex-1 px-6 py-4 text-sm font-medium transition-colors ${
+                className={`px-6 py-4 text-sm font-medium transition-colors whitespace-nowrap ${
                   activeTab === 'past'
                     ? 'text-emerald-600 border-b-2 border-emerald-600'
                     : 'text-neutral-400'
                 }`}
               >
-                Past ({pastBookings.length})
+                Completed ({pastBookings.length})
+              </button>
+              <button
+                onClick={() => setActiveTab('earnings')}
+                className={`px-6 py-4 text-sm font-medium transition-colors whitespace-nowrap ${
+                  activeTab === 'earnings'
+                    ? 'text-emerald-600 border-b-2 border-emerald-600'
+                    : 'text-neutral-400'
+                }`}
+              >
+                Earnings
+              </button>
+              <button
+                onClick={() => setActiveTab('reviews')}
+                className={`px-6 py-4 text-sm font-medium transition-colors whitespace-nowrap ${
+                  activeTab === 'reviews'
+                    ? 'text-emerald-600 border-b-2 border-emerald-600'
+                    : 'text-neutral-400'
+                }`}
+              >
+                Reviews ({reviews.length})
               </button>
             </div>
 
@@ -243,6 +275,88 @@ export default function TutorDashboard() {
                 ) : (
                   <div className="text-center py-12 text-neutral-400">No past sessions</div>
                 )
+              )}
+
+              {activeTab === 'earnings' && (
+                <div className="space-y-6">
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="bg-emerald-50 p-4 rounded-2xl text-center">
+                      <div className="text-2xl font-bold text-emerald-600">${totalEarnings.toFixed(2)}</div>
+                      <div className="text-xs text-neutral-500 mt-1">Total Earnings</div>
+                    </div>
+                    <div className="bg-blue-50 p-4 rounded-2xl text-center">
+                      <div className="text-2xl font-bold text-blue-600">{completedSessions}</div>
+                      <div className="text-xs text-neutral-500 mt-1">Sessions</div>
+                    </div>
+                    <div className="bg-purple-50 p-4 rounded-2xl text-center">
+                      <div className="text-2xl font-bold text-purple-600">${profile?.hourly_rate}</div>
+                      <div className="text-xs text-neutral-500 mt-1">Per Hour</div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="font-bold mb-4">Earnings Breakdown</h3>
+                    {bookings.filter(b => b.status === 'completed').length > 0 ? (
+                      <div className="space-y-2">
+                        {bookings.filter(b => b.status === 'completed').map((booking) => (
+                          <div key={booking.id} className="flex items-center justify-between p-3 bg-neutral-50 rounded-xl">
+                            <div>
+                              <div className="font-medium">{booking.student_name}</div>
+                              <div className="text-xs text-neutral-400">
+                                {new Date(booking.start_time).toLocaleDateString()}
+                              </div>
+                            </div>
+                            <div className="text-emerald-600 font-bold">
+                              +${parseFloat(booking.total_price || 0).toFixed(2)}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-neutral-400">No earnings yet</div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'reviews' && (
+                <div className="space-y-4">
+                  <div className="bg-linear-to-r from-yellow-50 to-orange-50 p-6 rounded-2xl">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-4xl font-bold text-yellow-600">{averageRating.toFixed(1)}</div>
+                        <div className="text-sm text-neutral-600 mt-1">Average Rating</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-2xl font-bold">{reviews.length}</div>
+                        <div className="text-sm text-neutral-600">Total Reviews</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {reviews.length > 0 ? (
+                    <div className="space-y-4">
+                      {reviews.map((review: any) => (
+                        <div key={review.id} className="bg-neutral-50 p-4 rounded-2xl space-y-2">
+                          <div className="flex items-center justify-between">
+                            <div className="font-bold">{review.student_name}</div>
+                            <div className="flex items-center gap-1 text-yellow-500">
+                              {[...Array(review.rating)].map((_, i) => (
+                                <Star key={i} className="w-4 h-4 fill-current" />
+                              ))}
+                            </div>
+                          </div>
+                          <p className="text-neutral-600 text-sm">{review.comment}</p>
+                          <div className="text-xs text-neutral-400">
+                            {new Date(review.created_at).toLocaleDateString()}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12 text-neutral-400">No reviews yet</div>
+                  )}
+                </div>
               )}
             </div>
           </div>
