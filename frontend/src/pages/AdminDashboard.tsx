@@ -571,15 +571,22 @@ export default function AdminDashboard() {
                 <div className="bg-emerald-50 p-6 rounded-2xl border border-emerald-100">
                   <form onSubmit={async (e) => {
                     e.preventDefault();
-                    const res = await fetch('/api/admin/categories', {
+                    const token = localStorage.getItem('token');
+                    const res = await fetch('/api/categories', {
                       method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
+                      headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                      },
                       body: JSON.stringify(newCategory)
                     });
                     if (res.ok) {
                       setNewCategory({ name: '', slug: '' });
                       setShowAddCategory(false);
                       fetchData();
+                      alert('Category added successfully!');
+                    } else {
+                      alert('Failed to add category');
                     }
                   }} className="grid md:grid-cols-3 gap-4">
                     <input 
@@ -618,13 +625,24 @@ export default function AdminDashboard() {
                     <button 
                       onClick={async () => {
                         if (confirm(`Delete category "${cat.name}"?`)) {
-                          const res = await fetch(`/api/admin/categories/${cat.id}`, { method: 'DELETE' });
-                          if (res.ok) fetchData();
+                          const token = localStorage.getItem('token');
+                          const res = await fetch(`/api/categories/${cat.id}`, { 
+                            method: 'DELETE',
+                            headers: {
+                              'Authorization': `Bearer ${token}`
+                            }
+                          });
+                          if (res.ok) {
+                            alert('Category deleted successfully!');
+                            fetchData();
+                          } else {
+                            alert('Failed to delete category');
+                          }
                         }
                       }}
                       className="opacity-0 group-hover:opacity-100 text-red-500 hover:bg-red-50 p-2 rounded-lg transition-all"
                     >
-                      <ShieldAlert className="w-5 h-5" />
+                      <Trash2 className="w-5 h-5" />
                     </button>
                   </div>
                 ))}
