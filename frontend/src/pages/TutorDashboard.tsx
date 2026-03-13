@@ -11,6 +11,13 @@ export default function TutorDashboard() {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past' | 'earnings' | 'reviews'>('upcoming');
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editForm, setEditForm] = useState({
+    bio: '',
+    hourly_rate: '',
+    subjects: '',
+    availability: ''
+  });
 
   useEffect(() => {
     fetchData();
@@ -28,7 +35,34 @@ export default function TutorDashboard() {
     setBookings(bookingsData);
     setProfile(tutorData);
     setReviews(reviewsData);
+    setEditForm({
+      bio: tutorData.bio || '',
+      hourly_rate: tutorData.hourly_rate || '',
+      subjects: tutorData.subjects || '',
+      availability: tutorData.availability || ''
+    });
     setLoading(false);
+  };
+
+  const handleUpdateProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const token = localStorage.getItem('token');
+    const res = await fetch('/api/tutors/profile', {
+      method: 'PUT',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(editForm)
+    });
+    
+    if (res.ok) {
+      alert('Profile updated successfully!');
+      setShowEditModal(false);
+      fetchData();
+    } else {
+      alert('Failed to update profile');
+    }
   };
 
   const handleStatusUpdate = async (id: number, status: string) => {
@@ -401,11 +435,18 @@ export default function TutorDashboard() {
 
               <Link
                 to="/profile"
+                className="block w-full bg-neutral-100 text-neutral-700 text-center py-3 rounded-xl font-medium hover:bg-neutral-200 transition-colors"
+              >
+                Change Avatar
+              </Link>
+
+              <button
+                onClick={() => setShowEditModal(true)}
                 className="block w-full bg-emerald-600 text-white text-center py-3 rounded-xl font-medium hover:bg-emerald-700 transition-colors"
               >
                 <Settings className="w-4 h-4 inline mr-2" />
-                Edit Profile
-              </Link>
+                Edit Profile Info
+              </button>
             </div>
 
             {/* Reviews Section */}
@@ -442,6 +483,101 @@ export default function TutorDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Edit Profile Modal */}
+      {showEditModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <motion.div 
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-white rounded-3xl p-8 max-w-2xl w-full space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto"
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="text-2xl font-bold">Edit Profile Information</h3>
+              <button 
+                onClick={() => setShowEditModal(false)}
+                className="text-neutral-400 hover:text-neutral-600 text-2xl"
+              >
+                ×
+              </button>
+            </div>
+            
+            <form onSubmit={handleUpdateProfile} className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  About Me (Bio)
+                </label>
+                <textarea 
+                  className="w-full p-4 rounded-2xl border border-neutral-200 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none h-32 resize-none"
+                  value={editForm.bio}
+                  onChange={(e) => setEditForm({...editForm, bio: e.target.value})}
+                  placeholder="Tell students about yourself, your teaching style, and experience..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  Subjects I Teach
+                </label>
+                <input 
+                  type="text"
+                  required
+                  className="w-full p-4 rounded-2xl border border-neutral-200 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none"
+                  value={editForm.subjects}
+                  onChange={(e) => setEditForm({...editForm, subjects: e.target.value})}
+                  placeholder="e.g., Mathematics, Physics, Chemistry"
+                />
+                <p className="text-xs text-neutral-500 mt-2">Separate multiple subjects with commas</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  Hourly Rate ($)
+                </label>
+                <input 
+                  type="number"
+                  required
+                  min="1"
+                  step="0.01"
+                  className="w-full p-4 rounded-2xl border border-neutral-200 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none"
+                  value={editForm.hourly_rate}
+                  onChange={(e) => setEditForm({...editForm, hourly_rate: e.target.value})}
+                  placeholder="25.00"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  Availability
+                </label>
+                <input 
+                  type="text"
+                  className="w-full p-4 rounded-2xl border border-neutral-200 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none"
+                  value={editForm.availability}
+                  onChange={(e) => setEditForm({...editForm, availability: e.target.value})}
+                  placeholder="e.g., Mon-Fri 9AM-5PM, Weekends available"
+                />
+              </div>
+
+              <div className="flex gap-4 pt-4">
+                <button 
+                  type="button"
+                  onClick={() => setShowEditModal(false)}
+                  className="flex-1 py-4 rounded-2xl font-bold text-neutral-500 hover:bg-neutral-50 transition-colors border border-neutral-200"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  className="flex-1 bg-emerald-600 text-white py-4 rounded-2xl font-bold hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }
