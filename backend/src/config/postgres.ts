@@ -1,10 +1,8 @@
 import pkg from 'pg';
 const { Pool } = pkg;
 
-// Parse connection string manually to handle special characters
 const connectionString = process.env.DATABASE_URL || '';
 
-// Only create pool if DATABASE_URL is provided
 let pool: any = null;
 
 if (connectionString && connectionString.trim() !== '') {
@@ -16,9 +14,13 @@ if (connectionString && connectionString.trim() !== '') {
     database: url.pathname.slice(1),
     user: url.username,
     password: url.password,
-    ssl: connectionString.includes('sslmode=require') ? {
+    ssl: {
       rejectUnauthorized: false
-    } : false
+    },
+    // Serverless-friendly settings
+    max: 1,
+    idleTimeoutMillis: 10000,
+    connectionTimeoutMillis: 10000,
   });
 }
 
