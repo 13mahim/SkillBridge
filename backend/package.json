@@ -2,7 +2,7 @@
   "name": "skillbridge-backend",
   "private": true,
   "version": "1.0.0",
-  "type": "module",
+
   "scripts": {
     "dev": "tsx src/index.ts",
     "seed": "tsx seed.ts",
