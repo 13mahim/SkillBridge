@@ -1,40 +1,53 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import type { Request, Response, NextFunction } from 'express';
-import { config } from '../src/config/index.js';
-import pool from '../src/config/postgres.js';
-import { initPostgresDb } from '../src/models/postgres-schema.js';
+
+// Config
+import { config } from '../src/config/index';
+
+// DB init
+import { initPostgresDb } from '../src/models/postgres-schema';
 
 // Routes
-import authRoutes from '../src/routes/authRoutes.js';
-import tutorRoutes from '../src/routes/tutorRoutes.js';
-import bookingRoutes from '../src/routes/bookingRoutes.js';
-import categoryRoutes from '../src/routes/categoryRoutes.js';
-import reviewRoutes from '../src/routes/reviewRoutes.js';
-import adminRoutes from '../src/routes/adminRoutes.js';
-import seedRoutes from '../src/routes/seedRoutes.js';
-import heroRoutes from '../src/routes/heroRoutes.js';
+import authRoutes from '../src/routes/authRoutes';
+import tutorRoutes from '../src/routes/tutorRoutes';
+import bookingRoutes from '../src/routes/bookingRoutes';
+import categoryRoutes from '../src/routes/categoryRoutes';
+import reviewRoutes from '../src/routes/reviewRoutes';
+import adminRoutes from '../src/routes/adminRoutes';
+import seedRoutes from '../src/routes/seedRoutes';
+import heroRoutes from '../src/routes/heroRoutes';
 
 const app = express();
 
-// CORS Middleware
-const corsMiddleware = (req: Request, res: Response, next: NextFunction) => {
+// CORS
+app.use((req: Request, res: Response, next: NextFunction) => {
   const origin = req.headers.origin || '';
-  const isAllowed = /^https:\/\/.*\.vercel\.app$/.test(origin) || origin === 'http://localhost:5173';
-  res.header('Access-Control-Allow-Origin', isAllowed ? origin : 'https://frontend-eta-five-90.vercel.app');
+  const isAllowed =
+    /^https:\/\/.*\.vercel\.app$/.test(origin) ||
+    origin === 'http://localhost:5173';
+  res.header(
+    'Access-Control-Allow-Origin',
+    isAllowed ? origin : 'https://frontend-eta-five-90.vercel.app'
+  );
   res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+  );
+  res.header(
+    'Access-Control-Allow-Methods',
+    'GET, POST, PUT, PATCH, DELETE, OPTIONS'
+  );
   if (req.method === 'OPTIONS') return res.sendStatus(200);
   next();
-};
+});
 
-app.use(corsMiddleware);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(cookieParser());
 
-// API Routes
+// Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/tutors', tutorRoutes);
 app.use('/api/bookings', bookingRoutes);
@@ -45,23 +58,28 @@ app.use('/api/seed', seedRoutes);
 app.use('/api/hero', heroRoutes);
 
 // Health check
-app.get('/health', (_req, res) => {
+app.get('/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok', message: 'SkillBridge API is running' });
 });
 
-app.get('/', (_req, res) => {
-  res.json({ 
-    status: 'ok', 
+// Root
+app.get('/', (_req: Request, res: Response) => {
+  res.json({
+    status: 'ok',
     message: '🎓 SkillBridge API',
-    endpoints: ['/api/tutors', '/api/categories', '/api/auth/login', '/api/auth/register']
+    endpoints: [
+      '/api/tutors',
+      '/api/categories',
+      '/api/auth/login',
+      '/api/auth/register',
+    ],
   });
 });
 
-// Initialize DB once (Vercel caches module between requests)
+// DB init flag (Vercel reuses warm instances)
 let initialized = false;
-const originalHandler = app;
 
-const handler = async (req: Request, res: Response) => {
+export default async function handler(req: Request, res: Response) {
   if (!initialized) {
     try {
       await initPostgresDb();
@@ -70,7 +88,5 @@ const handler = async (req: Request, res: Response) => {
       console.error('DB init error:', err);
     }
   }
-  return originalHandler(req, res);
-};
-
-export default handler;
+  return app(req, res);
+}

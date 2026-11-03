@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import db from '../config/database.js';
+import db from '../config/database';
 
 export const getAllUsers = async (req: Request, res: Response) => {
   const usePostgres = process.env.DATABASE_URL && process.env.DATABASE_URL.trim() !== '';

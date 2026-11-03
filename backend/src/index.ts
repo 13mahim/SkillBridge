@@ -1,20 +1,20 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import bcrypt from 'bcryptjs';
-import { config } from './config/index.js';
-import { corsMiddleware } from './middlewares/cors.js';
-import { initDb } from './models/database.js';
-import db from './config/database.js';
+import { config } from './config/index';
+import { corsMiddleware } from './middlewares/cors';
+import { initDb } from './models/database';
+import db from './config/database';
 
 // Routes
-import authRoutes from './routes/authRoutes.js';
-import tutorRoutes from './routes/tutorRoutes.js';
-import bookingRoutes from './routes/bookingRoutes.js';
-import categoryRoutes from './routes/categoryRoutes.js';
-import reviewRoutes from './routes/reviewRoutes.js';
-import adminRoutes from './routes/adminRoutes.js';
-import seedRoutes from './routes/seedRoutes.js';
-import heroRoutes from './routes/heroRoutes.js';
+import authRoutes from './routes/authRoutes';
+import tutorRoutes from './routes/tutorRoutes';
+import bookingRoutes from './routes/bookingRoutes';
+import categoryRoutes from './routes/categoryRoutes';
+import reviewRoutes from './routes/reviewRoutes';
+import adminRoutes from './routes/adminRoutes';
+import seedRoutes from './routes/seedRoutes';
+import heroRoutes from './routes/heroRoutes';
 
 const app = express();
 

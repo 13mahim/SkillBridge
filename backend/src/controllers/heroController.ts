@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import dbAdapter from '../config/db-adapter.js';
+import dbAdapter from '../config/db-adapter';
 
 export const getHeroContent = async (req: Request, res: Response) => {
   try {

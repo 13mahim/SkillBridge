@@ -1,5 +1,5 @@
-import { initPostgresDb } from './postgres-schema.js';
-import db from '../config/database.js';
+import { initPostgresDb } from './postgres-schema';
+import db from '../config/database';
 
 export async function initDb() {
   const usePostgres = process.env.DATABASE_URL && process.env.DATABASE_URL.trim() !== '';

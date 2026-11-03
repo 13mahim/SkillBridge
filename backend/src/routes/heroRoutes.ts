@@ -1,6 +1,6 @@
 import express from 'express';
-import { getHeroContent, updateHeroContent, deleteHeroContent } from '../controllers/heroController.js';
-import { authenticate, isAdmin } from '../middlewares/auth.js';
+import { getHeroContent, updateHeroContent, deleteHeroContent } from '../controllers/heroController';
+import { authenticate, isAdmin } from '../middlewares/auth';
 
 const router = express.Router();
 
